@@ -45,7 +45,7 @@ ggplot(Durchschnitt_Variante [(Durchschnitt_Variante$treatment == "1"|
        aes(x=treatment,y=mean_DM_treat, fill=treatment))+
   #geom_line()+
   #geom_point()+
-  geom_bar (stat="identity",position="dodge", color="black", size=0.1)+
+  geom_bar (stat="identity", position="dodge", color="black", size=0.1)+
   ylab("shoot dry matter [t*ha-1]")+
   xlab("")+
   Thema_shoot+
