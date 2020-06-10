@@ -3,6 +3,7 @@ library(readxl)
 library(gridExtra)
 library(ggpubr)
 library(lme4)
+library(chillR)
 
 #biopores
 biopore <- read_excel("data_Trial_C_2020_05_12.xlsx", 
@@ -85,6 +86,117 @@ b <- ggplot(ms1, aes(x = treatment, y = mean, fill = treatment)) +
 b
 
 ggarrange(a, b, ncol = 2, nrow = 1)
+
+
+
+#sprossdaten unsere plots: 
+#5, 7, 17, 19 sind treatment ww2
+#6, 8, 16, 21 sind rs2
+
+#spross <- read_excel("data Trial C_2020_06_04.xlsx", 
+#                     sheet = "PlantNutrients")
+#spross <- spross[-c(17, 34, 51, 68, 93, 110, 127, 144, 161, 178, 195, 212, 277, 310), ]
+
+#spross <- read_excel("data Trial C_2020_06_10_naemi.xlsx", 
+ #                 sheet = "PlantNutrients Bearbeitet")
+
+spross <- read_excel("data Trial C_2020_06_10_naemi.xlsx", 
+                     sheet = "PlantNutrients Bearbeitet", 
+                     col_types = c("text", "text", "text", 
+                                   "text", "text", "text", "text", "text", 
+                                   "date", "text", "text", "text", "text", 
+                                   "text", "text", "text", "text", "text", 
+                                   "text", "text", "text", "text", "text", 
+                                   "text", "text", "text", "text", "text", 
+                                   "text", "text", "text", "text", "text", 
+                                   "text", "text", "text", "numeric", 
+                                   "text", "text"))
+
+
+colnames(spross) = spross[1, ]
+spross <- slice(spross, 2:n())
+
+names(spross)[9] <- "date"
+names(spross)[10] <- "spross_dm"
+
+spross[19:39] <- NULL
+
+spross <- separate(spross, date, sep = "-", into =c("Year", "Month", "Day"))
+
+spross <- make_JDay(spross)
+
+spross <- transform(spross, spross_dm = as.numeric(spross_dm))
+
+spross <- spross %>% mutate_at(vars(spross_dm), funs(round(., 1)))
+
+spross <- filter(spross, treatment == c(5, 6))
+
+spross <- spross[-c(106), ]
+
+spross$rainout.shelter[is.na(spross$rainout.shelter)] = "without"
+
+ms <- spross %>% group_by(Year, treatment, rainout.shelter, JDay) %>% 
+  summarise(mean = mean(spross_dm), sd = sd(spross_dm))
+
+ms$treatment[ms$treatment == "5"] <- "WW2"
+ms$treatment[ms$treatment == "6"] <- "RS2"
+
+ms <- transform(ms, Year = as.factor(Year), 
+                treatment = as.factor(treatment))
+
+ggplot(ms, aes(x = JDay, y = mean, colour = interaction(rainout.shelter, treatment),
+               group = interaction(treatment, rainout.shelter))) + 
+  geom_point() + geom_line() +
+  facet_grid(cols = vars(Year)) +
+  scale_colour_manual(values = c("red3", "gray0", "#F0E442", "#0072B2"), name = "Treatment", 
+                      labels = c("RS2 With", "RS2 Without", "WW2 With", "WW2 Without")) +
+  labs(x = "Day Number", y = "Mean dry matter [kg  " ~ha^-1 ~"]", title = "Dry Matter") +
+  theme_bw() +
+  theme(axis.text = element_text(size = 10), 
+        axis.title = element_text(size = 11), 
+        plot.title = element_text(size = 15), 
+        strip.text.y = element_text(size = 10), 
+        strip.text.x = element_text(size = 10)) + 
+  theme_bw()
+
+
+#nur 
+ms_max <- ms %>%
+  group_by(Year) %>%
+  filter(JDay == max(JDay))
+
+ms_max <- unite(ms_max, treatment, rainout.shelter, col = treatment, sep = "-")
+
+b <- ggplot(ms_max, aes(x = treatment, y = mean, fill = treatment)) +
+  geom_bar(stat = "identity", position = position_dodge(), colour = "black") + 
+  geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd), width=.2,
+                position=position_dodge(.9)) +
+  scale_fill_manual(values = c("red3", "gray0", "#F0E442", "#0072B2")) +
+  facet_grid(cols = vars(Year)) +
+  labs(x = "Treatment", 
+       y = bquote("Mean dry matter [kg  " ~ha^-1 ~"]"),
+       title = "") + 
+  theme_bw() +
+  theme(axis.text = element_text(size = 10), 
+        axis.title = element_text(size = 11), 
+        plot.title = element_text(size = 15), 
+        strip.text.y = element_text(size = 10), 
+        strip.text.x = element_text(size = 10))
+b
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
