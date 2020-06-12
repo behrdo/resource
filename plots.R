@@ -180,7 +180,7 @@ b <- ggplot(ms_max, aes(x = treatment, y = mean, fill = treatment)) +
   scale_fill_manual(values = c("red3", "#F0E442", "darkgreen", "#0072B2")) +
   facet_grid(cols = vars(Year)) +
   scale_x_discrete(breaks = unique(ms_max$treatment),
-                   labels = addline_format(c("WW2 Without", "RS2 Without", "WW2 With", "WW2 Without"))) +
+                   labels = addline_format(c("WW2 Without", "RS2 Without", "WW2 With", "RS2 With"))) +
   labs(x = "Treatment", 
        y = bquote("Mean dry matter [kg  " ~ha^-1 ~"]"),
        title = "Dry matter at the last Harvest") + 
@@ -192,9 +192,6 @@ b <- ggplot(ms_max, aes(x = treatment, y = mean, fill = treatment)) +
         strip.text.x = element_text(size = 10), 
         legend.position = "none")
 b
-
-
-
 
 
 
