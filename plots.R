@@ -93,13 +93,6 @@ ggarrange(a, b, ncol = 2, nrow = 1)
 #5, 7, 17, 19 sind treatment ww2
 #6, 8, 16, 21 sind rs2
 
-#spross <- read_excel("data Trial C_2020_06_04.xlsx", 
-#                     sheet = "PlantNutrients")
-#spross <- spross[-c(17, 34, 51, 68, 93, 110, 127, 144, 161, 178, 195, 212, 277, 310), ]
-
-#spross <- read_excel("data Trial C_2020_06_10_naemi.xlsx", 
- #                 sheet = "PlantNutrients Bearbeitet")
-
 spross <- read_excel("data Trial C_2020_06_10_naemi.xlsx", 
                      sheet = "PlantNutrients Bearbeitet", 
                      col_types = c("text", "text", "text", 
@@ -112,10 +105,6 @@ spross <- read_excel("data Trial C_2020_06_10_naemi.xlsx",
                                    "text", "text", "text", "numeric", 
                                    "text", "text"))
 
-###
-#colnames(spross) = spross[1, ]
-#spross <- slice(spross, 2:n())
-###
 
 #1. data frame vorbereiten
 spross <- slice(spross, 1:360)
@@ -203,7 +192,6 @@ b <- ggplot(ms_max, aes(x = treatment, y = mean, fill = treatment)) +
         strip.text.x = element_text(size = 10), 
         legend.position = "none")
 b
-#error weil 2014 nur 2 treatments -> mähsde nix
 
 
 
