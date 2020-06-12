@@ -112,9 +112,13 @@ spross <- read_excel("data Trial C_2020_06_10_naemi.xlsx",
                                    "text", "text", "text", "numeric", 
                                    "text", "text"))
 
+###
+#colnames(spross) = spross[1, ]
+#spross <- slice(spross, 2:n())
+###
 
-colnames(spross) = spross[1, ]
-spross <- slice(spross, 2:n())
+#1. data frame vorbereiten
+spross <- slice(spross, 1:360)
 
 names(spross)[9] <- "date"
 names(spross)[10] <- "spross_dm"
@@ -129,11 +133,19 @@ spross <- transform(spross, spross_dm = as.numeric(spross_dm))
 
 spross <- spross %>% mutate_at(vars(spross_dm), funs(round(., 1)))
 
-spross <- filter(spross, treatment == c(5, 6))
+f <- filter(spross, treatment == "5")
+s <- filter(spross, treatment == "6")
 
-spross <- spross[-c(106), ]
+spross <- bind_rows(f, s)
 
+###
+#spross <- spross[-c(106), ]
+###
+
+spross <- transform(spross, rainout.shelter = as.character(rainout.shelter))
 spross$rainout.shelter[is.na(spross$rainout.shelter)] = "without"
+
+spross <- drop_na(spross, spross_dm)
 
 ms <- spross %>% group_by(Year, treatment, rainout.shelter, JDay) %>% 
   summarise(mean = mean(spross_dm), sd = sd(spross_dm))
@@ -144,12 +156,13 @@ ms$treatment[ms$treatment == "6"] <- "RS2"
 ms <- transform(ms, Year = as.factor(Year), 
                 treatment = as.factor(treatment))
 
+#line und point plot mit den unterschiedlichen harvests
 ggplot(ms, aes(x = JDay, y = mean, colour = interaction(rainout.shelter, treatment),
                group = interaction(treatment, rainout.shelter))) + 
   geom_point() + geom_line() +
   facet_grid(cols = vars(Year)) +
-  scale_colour_manual(values = c("red3", "gray0", "#F0E442", "#0072B2"), name = "Treatment", 
-                      labels = c("RS2 With", "RS2 Without", "WW2 With", "WW2 Without")) +
+  scale_colour_manual(values = c("red3", "#F0E442", "darkgreen", "#0072B2"), name = "Treatment", 
+                      labels = c("WW2 Without", "RS2 Without", "WW2 With", "WW2 Without")) +
   labs(x = "Day Number", y = "Mean dry matter [kg  " ~ha^-1 ~"]", title = "Dry Matter") +
   theme_bw() +
   theme(axis.text = element_text(size = 10), 
@@ -158,32 +171,39 @@ ggplot(ms, aes(x = JDay, y = mean, colour = interaction(rainout.shelter, treatme
         strip.text.y = element_text(size = 10), 
         strip.text.x = element_text(size = 10)) + 
   theme_bw()
+#error weil 2016 nur an einem date gemessen wurde -> mähsde nix
 
-
-#nur 
+#DM barplot mit letztem harvest
 ms_max <- ms %>%
   group_by(Year) %>%
   filter(JDay == max(JDay))
 
 ms_max <- unite(ms_max, treatment, rainout.shelter, col = treatment, sep = "-")
 
+addline_format <- function(x,...){
+  gsub("\\s","\n",x)
+}
+
 b <- ggplot(ms_max, aes(x = treatment, y = mean, fill = treatment)) +
   geom_bar(stat = "identity", position = position_dodge(), colour = "black") + 
   geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd), width=.2,
                 position=position_dodge(.9)) +
-  scale_fill_manual(values = c("red3", "gray0", "#F0E442", "#0072B2")) +
+  scale_fill_manual(values = c("red3", "#F0E442", "darkgreen", "#0072B2")) +
   facet_grid(cols = vars(Year)) +
+  scale_x_discrete(breaks = unique(ms_max$treatment),
+                   labels = addline_format(c("WW2 Without", "RS2 Without", "WW2 With", "WW2 Without"))) +
   labs(x = "Treatment", 
        y = bquote("Mean dry matter [kg  " ~ha^-1 ~"]"),
-       title = "") + 
+       title = "Dry matter at the last Harvest") + 
   theme_bw() +
   theme(axis.text = element_text(size = 10), 
         axis.title = element_text(size = 11), 
         plot.title = element_text(size = 15), 
         strip.text.y = element_text(size = 10), 
-        strip.text.x = element_text(size = 10))
+        strip.text.x = element_text(size = 10), 
+        legend.position = "none")
 b
-
+#error weil 2014 nur 2 treatments -> mähsde nix
 
 
 
