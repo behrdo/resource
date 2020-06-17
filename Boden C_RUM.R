@@ -17,7 +17,7 @@ Rohdaten_soil$depth<-as.character(Rohdaten_soil$depth)
 #Durchschnitt und Standardabweichung pro Parzelle und Tiefe und Sampling date
 Durchschnitt_pro_Parzelle <- Rohdaten_soil %>%
   group_by(date, fieldrep,treatment,depth_class) %>%
-  summarise(mean_Parameter=mean(K_kgha, na.rm=TRUE), SD_Parameter=sd(K_kgha, na.rm=TRUE))
+  summarise(mean_Parameter=mean(K_mgkg, na.rm=TRUE), SD_Parameter=sd(K_mgkg, na.rm=TRUE))
 
 Durchschnitt_pro_Parzelle$fieldrep<-as.character(Durchschnitt_pro_Parzelle$fieldrep)
 Durchschnitt_pro_Parzelle$treatment<-as.character(Durchschnitt_pro_Parzelle$treatment)
@@ -40,8 +40,9 @@ Farben_Varianten <- c("3"="chartreuse3", "2"="cyan3", "1"="royalblue3","4"="roya
 
 #Abstände und Zeiträume im Vergleich
 #pro Variante der Durchschnitt der vier Parzellen dargestellt 
-tiff("soil.tiff",
-     width=10,height=10,unit="cm",res=200)
+#v- jeder plot bis dev.off wird drekt hochgeladen
+#tiff("soil.tiff",
+ #    width=10,height=10,unit="cm",res=200)
 ggplot(Durchschnitt_Variante_date [(Durchschnitt_Variante_date$treatment == "1"| 
                                         Durchschnitt_Variante_date$treatment == "2"|
                                         Durchschnitt_Variante_date$treatment == "3"|
