@@ -159,7 +159,10 @@ s <- filter(spross, treatment == "6")
 
 spross <- bind_rows(f, s)
 
-spross <- transform(spross, rainout.shelter = as.character(rainout.shelter))
+spross <- transform(spross, rainout.shelter = as.factor(rainout.shelter), 
+                    field.rep = as.factor(field.rep), 
+                    plot = as.factor(plot), 
+                    Rep = as.factor(Rep))
 
 spross$rainout.shelter[is.na(spross$rainout.shelter)] = "without"
 
@@ -178,44 +181,175 @@ w_barley <- filter(spross, crop == "winter barley")
 oats <- filter(spross, crop == "oats")
 
 s_osr[5] <- NULL
-#checking 
-model1 <- lm(spross_dm ~ treatment, data = s_barley)
 
+#anova for 2014/spring barley
+#one way anova
+model1 <- lm(spross_dm ~ treatment, data = s_barley)
+summary(model1)
+
+model2 <- lm(spross_dm ~ 1, data = s_barley)
+summary(model2)
+
+anova(model1, model2)
+#p-value: 0.05026 -> the treatment has a significant effect?? at least close :D
+#but are they even nd? ->
 par(mfrow = c(2, 2))
 plot(model1)
+plot(model2)
 par(mfrow = c(1, 1))
+#jup i would say so
 
-#two way anova, with treatment and rain shelter
-model1 <- lm(gesamt ~ treatment*, data = df)
+#anova for 2015/spring oil seed rape
+#two way anova, with treatment and rainout shelter as main effects
+model1 <- lm(spross_dm ~ treatment*rainout.shelter, data = s_osr)
 summary(model1)
-#the variance dependent on fieldrep is much lower than the residual variance, the
-#variance dependent on fieldrep appears not to be significantly different from zero
 
-confint(model1, parm = "sd_(Intercept)|field.repetition", level=0.95, 
-        method = "profile", oldNames = F)
-#Conclusion: The confidence interval for the standard deviation does include zero; 
-#-> accept the null hypothesis that the variance is zero.
-#a significant effect of fieldrep on the DM_mean can not be shown
-
-model2 <- lmer(gesamt ~ (1|field.repetition), data = df)
+model2 <- lm(spross_dm ~ treatment, data = s_osr)
 summary(model1)
 
 anova(model1, model2)
-#p-value: 0.3812 -> the treatment has no significant effect on the Biopores gesamt
+#p-value: 0.6509 -> no significant effect
+
+#introducing field.rep as a random factor
+model1 <- lmer(spross_dm ~ treatment*rainout.shelter + (1|field.rep), data = s_osr)
+summary(model1)
+
+model2 <- lmer(spross_dm ~ treatment + (1|field.rep) , data = s_osr)
+summary(model1)
+
+anova(model1, model2)
+#p-value: 0.21 -> no significant effect
+
+model1 <- lmer(spross_dm ~ treatment*rainout.shelter + (1|field.rep), data = s_osr)
+summary(model1)
+
+model2 <- lmer(spross_dm ~ rainout.shelter + (1|field.rep) , data = s_osr)
+summary(model1)
+
+anova(model1, model2)
+#p-value: 0.2073 -> no significant effect
+
+model1 <- lmer(spross_dm ~ treatment + (1|field.rep), data = s_osr)
+summary(model1)
+
+model2 <- lmer(spross_dm ~ (1|field.rep) , data = s_osr)
+summary(model1)
+
+anova(model1, model2)
+#p-value: 0.3882 -> no significant effect
+
+model1 <- lmer(spross_dm ~ rainout.shelter + (1|field.rep), data = s_osr)
+summary(model1)
+
+model2 <- lmer(spross_dm ~ (1|field.rep) , data = s_osr)
+summary(model1)
+
+anova(model1, model2)
+#p-value: 0.3963 -> no significant effect
+#conclusions: no significant effect of either the fixed or the random effects on the DM
+
+#anova for 2016/winter barley
+#two way anova, with treatment and rainout shelter as main effects
+model1 <- lm(spross_dm ~ treatment*rainout.shelter, data = w_barley)
+summary(model1)
+
+model2 <- lm(spross_dm ~ treatment, data = w_barley)
+summary(model1)
+
+anova(model1, model2)
+#p-value: 1.119e-06 -> significant effect of rainout.shelter
+model1 <- lm(spross_dm ~ treatment*rainout.shelter, data = w_barley)
+summary(model1)
+
+model2 <- lm(spross_dm ~ rainout.shelter, data = w_barley)
+summary(model1)
+
+anova(model1, model2)
+#p-value: 0.7249 -> not significant effect of treatment
+#but are they even nd? ->
+par(mfrow = c(2, 2))
+plot(model1)
+plot(model2)
+par(mfrow = c(1, 1))
+#jup i would say so
+
+#anova for 2017/oats
+#two-way anova with treatment and rainout shelter as fixed effects
+model1 <- lm(spross_dm ~ treatment*rainout.shelter, data = oats)
+summary(model1)
+
+model2 <- lm(spross_dm ~ treatment, data = oats)
+summary(model1)
+
+anova(model1, model2)
+#p-value: 0.7249 -> no significant effect 
+
+model1 <- lm(spross_dm ~ treatment*rainout.shelter, data = oats)
+summary(model1)
+
+model2 <- lm(spross_dm ~ rainout.shelter, data = oats)
+summary(model1)
+
+anova(model1, model2)
+#p-value: 0.5976 -> no significant effect 
+
+#two-way anova introducing field.rep as random effect
+model1 <- lmer(spross_dm ~ treatment*rainout.shelter + (1|field.rep), data = oats)
+summary(model1)
+
+model2 <- lmer(spross_dm ~ rainout.shelter + (1|field.rep) , data = oats)
+summary(model1)
+
+anova(model1, model2)
+#p-value: 0.4782 -> no significant effect 
+
+model1 <- lmer(spross_dm ~ treatment*rainout.shelter + (1|field.rep), data = oats)
+summary(model1)
+
+model2 <- lmer(spross_dm ~ treatment + (1|field.rep) , data = oats)
+summary(model1)
+
+anova(model1, model2)
+#p-value: 0.4215 -> no significant effect 
+
+model1 <- lmer(spross_dm ~ rainout.shelter + (1|field.rep), data = oats)
+summary(model1)
+
+model2 <- lmer(spross_dm ~ (1|field.rep) , data = oats)
+summary(model1)
+
+anova(model1, model2)
+#p-value: 0.4814 -> no significant effect
+
+model1 <- lmer(spross_dm ~ treatment + (1|field.rep), data = oats)
+summary(model1)
+
+model2 <- lmer(spross_dm ~ (1|field.rep) , data = oats)
+summary(model1)
+
+anova(model1, model2)
+#p-value: 0.6219 -> no significant effect
 
 
+#two-way anova introducing Rep as random effect
+model1 <- lmer(spross_dm ~ treatment*rainout.shelter + (1|Rep), data = oats)
+summary(model1)
 
+model2 <- lmer(spross_dm ~ rainout.shelter + (1|Rep) , data = oats)
+summary(model1)
 
+anova(model1, model2)
+#p-value: 0.5123 -> no significant effect 
 
+model1 <- lmer(spross_dm ~ treatment*rainout.shelter + (1|Rep), data = oats)
+summary(model1)
 
+model2 <- lmer(spross_dm ~ treatment + (1|Rep) , data = oats)
+summary(model1)
 
-
-
-
-
-
-
-
+anova(model1, model2)
+#p-value: 0.4566 -> no significant effect 
+#makes no sence to continue further, effect of Rep is lower than the effect of field.rep
 
 
 
