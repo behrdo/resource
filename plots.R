@@ -192,7 +192,7 @@ b <- ggplot(ms_max, aes(x = treatment, y = mean, fill = treatment)) +
         strip.text.x = element_text(size = 10), 
         legend.position = "none")
 b
-
+1
 
 
 
