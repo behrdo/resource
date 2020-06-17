@@ -4,7 +4,7 @@ library(gridExtra)
 library(ggpubr)
 library(lme4)
 library(chillR)
-#blabla
+
 Rohdaten_shoot <- read.csv2("precrop data C.csv")
 
 #statistical analysis for dry matter
