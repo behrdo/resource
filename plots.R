@@ -150,7 +150,7 @@ ggplot(ms, aes(x = JDay, y = mean, colour = interaction(rainout.shelter, treatme
                group = interaction(treatment, rainout.shelter))) + 
   geom_point() + geom_line() +
   facet_grid(cols = vars(Year)) +
-  scale_colour_manual(values = c("orange4", "steelblue4", "orange2", "steelblue2"), name = "Treatment", 
+  scale_colour_manual(values = c("brown4", "steelblue4", "brown2", "steelblue2"), name = "Treatment", 
                       labels = c("WW2 Without", "RS2 Without", "WW2 With", "WW2 Without")) +
   labs(x = "Day Number", y = "Mean dry matter [kg  " ~ha^-1 ~"]", title = "Dry Matter") +
   theme_bw() +
@@ -177,7 +177,7 @@ b <- ggplot(ms_max, aes(x = treatment, y = mean, fill = treatment)) +
   geom_bar(stat = "identity", position = position_dodge(), colour = "black") + 
   geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd), width=.2,
                 position=position_dodge(.9)) +
-  scale_fill_manual(values = c("orange4", "steelblue4", "orange2", "steelblue2")) +
+  scale_fill_manual(values = c("brown4", "steelblue4", "brown2", "steelblue2")) +
   facet_grid(cols = vars(Year)) +
   scale_x_discrete(breaks = unique(ms_max$treatment),
                    labels = addline_format(c("WW2 Without", "RS2 Without", "WW2 With", "RS2 With"))) +
@@ -191,7 +191,7 @@ b <- ggplot(ms_max, aes(x = treatment, y = mean, fill = treatment)) +
         strip.text.y = element_text(size = 10), 
         strip.text.x = element_text(size = 10), 
         legend.position = "none")
-# wie ändere ich die Fraben?
+b
 
 
 
