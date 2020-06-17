@@ -41,28 +41,6 @@ anova(model1, model2)
 
 
 ###
-#two way anova, introducing fieldrep as a random factor (not sure if this makes too much sense
-#since the sample size of fieldrep is only 2)
-model1 <- lmer(DM_mean ~ treatment + (1|fieldrep), data = qw)
-summary(model1)
-#the variance dependent on fieldrep is much higher than the residual variance, the
-#variance dependent on fieldrep appears to be significantly different from zero
-
-confint(model1, parm = "sd_(Intercept)|fieldrep", level=0.95, 
-        method = "profile", oldNames = F)
-#Conclusion: The confidence interval for the standard deviation does not include zero; 
-#-> reject the null hypothesis that the variance is zero.
-#a significant effect of fieldrep on the DM_mean can be shown 
-
-model2 <- lmer(DM_mean ~ (1|fieldrep), data = qw)
-summary(model1)
-
-anova(model1, model2)
-#model1 is the better model
-#p-value: 0.01052 -> after removing the effect of fieldrep on DM_mean, it can be shown, that
-#treatments have a significant effect on DM_mean
-###
-
 #statistical analysis for biopores
 #1. changing the dataframe into something i can work with :D
 biopore <- read_excel("data_Trial_C_2020_05_12.xlsx", 
