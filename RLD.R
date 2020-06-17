@@ -38,15 +38,7 @@ RLD$rainout.shelter[is.na(RLD$rainout.shelter)] = "without"
 
 RLD <- transform(RLD, treatment = as.factor(treatment),
                  plot = as.factor(plot),
-                 field.rep = as.factor(field.rep), 
-                 rainout.shelter = as.factor(rainout.shelter),
-                 depth = as.numeric(depth),
-                 tot_cm3 = as.numeric(tot_cm3),
-                 blk_cm3 = as.numeric(blk_cm3),
-                 BP_cm3 = as.numeric(BP_cm3),
-                 tot_m2 = as.numeric(tot_m2),
-                 blk_m2 = as.numeric(blk_m2),
-                 BP_m2 = as.numeric(BP_m2))
+                 rainout.shelter = as.factor(rainout.shelter))
 
 
 
