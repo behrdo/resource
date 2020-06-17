@@ -127,10 +127,6 @@ s <- filter(spross, treatment == "6")
 
 spross <- bind_rows(f, s)
 
-###
-#spross <- spross[-c(106), ]
-###
-
 spross <- transform(spross, rainout.shelter = as.character(rainout.shelter))
 spross$rainout.shelter[is.na(spross$rainout.shelter)] = "without"
 
@@ -191,10 +187,22 @@ b <- ggplot(ms_max, aes(x = treatment, y = mean, fill = treatment)) +
         strip.text.y = element_text(size = 10), 
         strip.text.x = element_text(size = 10), 
         legend.position = "none")
-# wie ändere ich die Fraben?
+b
 
+#rohdaten soil
+roh <- read.csv2("soil data C.csv")
 
+r1 <- filter(roh, treatment == 5)
+r2 <- filter(roh, treatment == 6)
 
+roh <- bind_rows(r1, r2)
+
+roh <- transform(roh, depth = as.factor(depth), 
+                treatment = as.factor(treatment), 
+                date = as.factor(date), 
+                plot = as.factor(plot), 
+                fieldrep = as.factor(fieldrep), 
+                depth_class = as.factor(depth_class))
 
 
 
