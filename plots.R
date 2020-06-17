@@ -127,10 +127,6 @@ s <- filter(spross, treatment == "6")
 
 spross <- bind_rows(f, s)
 
-###
-#spross <- spross[-c(106), ]
-###
-
 spross <- transform(spross, rainout.shelter = as.character(rainout.shelter))
 spross$rainout.shelter[is.na(spross$rainout.shelter)] = "without"
 
@@ -192,9 +188,6 @@ b <- ggplot(ms_max, aes(x = treatment, y = mean, fill = treatment)) +
         strip.text.x = element_text(size = 10), 
         legend.position = "none")
 b
-1
-
-
 
 
 
