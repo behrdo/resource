@@ -16,8 +16,8 @@ Rohdaten_soil$depth<-as.character(Rohdaten_soil$depth)
 
 #Durchschnitt und Standardabweichung pro Parzelle und Tiefe und Sampling date
 Durchschnitt_pro_Parzelle <- Rohdaten_soil %>%
-  group_by(date, fieldrep,treatment,depth_class) %>%
-  summarise(mean_Parameter=mean(K_kgha, na.rm=TRUE), SD_Parameter=sd(K_kgha, na.rm=TRUE))
+  group_by(date, fieldrep, treatment, depth_class) %>%
+  summarise(mean_Parameter = mean(K_mgkg, na.rm=TRUE), SD_Parameter = sd(K_mgkg, na.rm=TRUE))
 
 Durchschnitt_pro_Parzelle$fieldrep<-as.character(Durchschnitt_pro_Parzelle$fieldrep)
 Durchschnitt_pro_Parzelle$treatment<-as.character(Durchschnitt_pro_Parzelle$treatment)
@@ -40,8 +40,9 @@ Farben_Varianten <- c("3"="chartreuse3", "2"="cyan3", "1"="royalblue3","4"="roya
 
 #Abstände und Zeiträume im Vergleich
 #pro Variante der Durchschnitt der vier Parzellen dargestellt 
-tiff("soil.tiff",
-     width=10,height=10,unit="cm",res=200)
+#tiff("soil.tiff",
+#     width=10,height=10,unit="cm",res=200)
+
 ggplot(Durchschnitt_Variante_date [(Durchschnitt_Variante_date$treatment == "1"| 
                                         Durchschnitt_Variante_date$treatment == "2"|
                                         Durchschnitt_Variante_date$treatment == "3"|
@@ -70,7 +71,8 @@ ggplot(Durchschnitt_Variante_date [(Durchschnitt_Variante_date$treatment == "1"|
         axis.title.x = element_text(size = 12),
         axis.title.y = element_text(size = 12),
         axis.text.y = element_text(size = 10))
-dev.off()
+
+#dev.off()
 
 
 #für ANOVA----------------------
@@ -96,8 +98,8 @@ library("agricolae")
 Daten_aov_Var$treatment <- as.factor (Daten_aov_Var$treatment)
 Daten_aov_Var$fieldrep <- as.factor (Daten_aov_Var$fieldrep)
 
-AOV_Daten_aov <- aov(mean_Parameter ~ treatment + (fieldrep), data = Daten_aov_Var)
-Tukey_Daten_aov <-HSD.test(AOV_Daten_aov, "treatment",
+aov(mean_Parameter ~ treatment + (fieldrep), data = Daten_aov_Var)
+HSD.test(AOV_Daten_aov, "treatment",
                            group = TRUE,
                            console = TRUE)
 

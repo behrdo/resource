@@ -148,7 +148,7 @@ ggplot(ms, aes(x = JDay, y = mean, colour = interaction(rainout.shelter, treatme
   facet_grid(cols = vars(Year)) +
   scale_colour_manual(values = c("orange4", "steelblue4", "orange2", "steelblue2"), name = "Treatment", 
                       labels = c("WW2 Without", "RS2 Without", "WW2 With", "WW2 Without")) +
-  labs(x = "Day Number", y = "Mean dry matter [kg  " ~ha^-1 ~"]", title = "Dry Matter") +
+  labs(x = "Day Number", y = "Mean dry matter [kg*" ~ha^-1 ~"]", title = "Dry Matter") +
   theme_bw() +
   theme(axis.text = element_text(size = 10), 
         axis.title = element_text(size = 11), 
@@ -178,7 +178,7 @@ b <- ggplot(ms_max, aes(x = treatment, y = mean, fill = treatment)) +
   scale_x_discrete(breaks = unique(ms_max$treatment),
                    labels = addline_format(c("WW2 Without", "RS2 Without", "WW2 With", "RS2 With"))) +
   labs(x = "Treatment", 
-       y = bquote("Mean dry matter [kg  " ~ha^-1 ~"]"),
+       y = bquote("Mean dry matter [kg*" ~ha^-1 ~"]"),
        title = "Dry matter at the last Harvest") + 
   theme_bw() +
   theme(axis.text = element_text(size = 10), 
