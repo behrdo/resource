@@ -146,7 +146,7 @@ ggplot(ms, aes(x = JDay, y = mean, colour = interaction(rainout.shelter, treatme
                group = interaction(treatment, rainout.shelter))) + 
   geom_point() + geom_line() +
   facet_grid(cols = vars(Year)) +
-  scale_colour_manual(values = c("orange4", "steelblue4", "orange2", "steelblue2"), name = "Treatment", 
+  scale_colour_manual(values = c("brown4", "steelblue4", "brown2", "steelblue2"), name = "Treatment", 
                       labels = c("WW2 Without", "RS2 Without", "WW2 With", "WW2 Without")) +
   labs(x = "Day Number", y = "Mean dry matter [kg*" ~ha^-1 ~"]", title = "Dry Matter") +
   theme_bw() +
@@ -173,7 +173,7 @@ b <- ggplot(ms_max, aes(x = treatment, y = mean, fill = treatment)) +
   geom_bar(stat = "identity", position = position_dodge(), colour = "black") + 
   geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd), width=.2,
                 position=position_dodge(.9)) +
-  scale_fill_manual(values = c("orange4", "steelblue4", "orange2", "steelblue2")) +
+  scale_fill_manual(values = c("brown4", "steelblue4", "brown2", "steelblue2")) +
   facet_grid(cols = vars(Year)) +
   scale_x_discrete(breaks = unique(ms_max$treatment),
                    labels = addline_format(c("WW2 Without", "RS2 Without", "WW2 With", "RS2 With"))) +
@@ -188,21 +188,6 @@ b <- ggplot(ms_max, aes(x = treatment, y = mean, fill = treatment)) +
         strip.text.x = element_text(size = 10), 
         legend.position = "none")
 b
-
-#rohdaten soil
-roh <- read.csv2("soil data C.csv")
-
-r1 <- filter(roh, treatment == 5)
-r2 <- filter(roh, treatment == 6)
-
-roh <- bind_rows(r1, r2)
-
-roh <- transform(roh, depth = as.factor(depth), 
-                treatment = as.factor(treatment), 
-                date = as.factor(date), 
-                plot = as.factor(plot), 
-                fieldrep = as.factor(fieldrep), 
-                depth_class = as.factor(depth_class))
 
 
 
