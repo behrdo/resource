@@ -37,7 +37,7 @@ a <- ggplot(Durchschnitt_Variante_date [(  Durchschnitt_Variante_date$treatment 
   geom_bar (stat="identity",position="dodge", color="black", size=0.1)+
   ylab(bquote("Mean K [kg *" ~ha^-1 ~"]"))+
   xlab("soil depth (cm)")+
-  Thema_soil+
+  Thema_soil +
   scale_y_continuous(position = "right", breaks = c(0, 100, 200, 300, 400, 500),
                      labels = c("0", "100", "200", "300", "400", "500"),
                      limits=c(0,500))+
@@ -50,7 +50,7 @@ a <- ggplot(Durchschnitt_Variante_date [(  Durchschnitt_Variante_date$treatment 
   theme(axis.text.x = element_text(size = 10),
         axis.ticks.x=element_line(size=0.5),
         legend.title=element_blank(),
-        legend.position="right",
+        legend.position="none",
         legend.text = element_text(size = 12),
         legend.spacing.x = unit(0.2, 'cm'),
         axis.title.x = element_text(size = 12),
@@ -81,7 +81,7 @@ b <- ggplot(Durchschnitt_Variante_date [(  Durchschnitt_Variante_date$treatment 
   theme(axis.text.x = element_text(size = 10),
         axis.ticks.x=element_line(size=0.5),
         legend.title=element_blank(),
-        legend.position="right",
+        legend.position="none",
         legend.text = element_text(size = 12),
         legend.spacing.x = unit(0.2, 'cm'),
         axis.title.x = element_text(size = 12),
@@ -112,7 +112,7 @@ c <- ggplot(Durchschnitt_Variante_date [(  Durchschnitt_Variante_date$treatment 
   theme(axis.text.x = element_text(size = 10),
         axis.ticks.x=element_line(size=0.5),
         legend.title=element_blank(),
-        legend.position="right",
+        legend.position="none",
         legend.text = element_text(size = 12),
         legend.spacing.x = unit(0.2, 'cm'),
         axis.title.x = element_text(size = 12),
@@ -143,7 +143,7 @@ d <- ggplot(Durchschnitt_Variante_date [(  Durchschnitt_Variante_date$treatment 
   theme(axis.text.x = element_text(size = 10),
         axis.ticks.x=element_line(size=0.5),
         legend.title=element_blank(),
-        legend.position="right",
+        legend.position="none",
         legend.text = element_text(size = 12),
         legend.spacing.x = unit(0.2, 'cm'),
         axis.title.x = element_text(size = 12),
@@ -155,35 +155,7 @@ d
 Durchschnitt_Variante_date <-
   Durchschnitt_Variante[Durchschnitt_Variante$date == 4,]
 
-e <- ggplot(Durchschnitt_Variante_date [(  Durchschnitt_Variante_date$treatment == "5"|
-                                             Durchschnitt_Variante_date$treatment == "6"),], 
-            aes(x=depth_class,y=mean_Parameter_treat, fill=treatment))+
-  geom_bar (stat="identity",position="dodge", color="black", size=0.1)+
-  ylab(bquote("Mean K [kg *" ~ha^-1 ~"]"))+
-  xlab("soil depth (cm)")+
-  Thema_soil+
-  scale_y_continuous(position = "right", breaks = c(0, 100, 200, 300, 400, 500),
-                     labels = c("0", "100", "200", "300", "400", "500"),
-                     limits=c(0,500))+
-  geom_errorbar(aes(ymin=mean_Parameter_treat-SD_Parameter_treat,
-                    ymax=mean_Parameter_treat+SD_Parameter_treat),position=position_dodge(width=0.9))+  
-  scale_x_reverse(breaks=c(1,2,3,4), labels=c("0-30", "30-45", "45-75", "75-105"))+
-  coord_flip()+
-  ggtitle("(E)") +
-  scale_color_manual(values = Farben_Varianten, aesthetics = "fill", labels=c("RS2", "WW2"))+
-  theme(axis.text.x = element_text(size = 10),
-        axis.ticks.x=element_line(size=0.5),
-        legend.title=element_blank(),
-        legend.position="right",
-        legend.text = element_text(size = 12),
-        legend.spacing.x = unit(0.2, 'cm'),
-        axis.title.x = element_text(size = 12),
-        axis.title.y = element_text(size = 12),
-        axis.text.y = element_text(size = 10),
-        plot.title = element_text(size = 15, vjust = -115, hjust = 0.99))
-e
-
-K <- ggarrange(a, b, c, d, ncol = 4, nrow = 1, common.legend = TRUE, legend = "bottom")
+K <- ggarrange(a, b, c, d, ncol = 4, nrow = 1)
 K
 
 #C
@@ -226,7 +198,7 @@ e <- ggplot(Durchschnitt_Variante_date [(  Durchschnitt_Variante_date$treatment 
   theme(axis.text.x = element_text(size = 10),
         axis.ticks.x=element_line(size=0.5),
         legend.title=element_blank(),
-        legend.position="right",
+        legend.position="none",
         legend.text = element_text(size = 12),
         legend.spacing.x = unit(0.2, 'cm'),
         axis.title.x = element_text(size = 12),
@@ -257,7 +229,7 @@ f <- ggplot(Durchschnitt_Variante_date [(  Durchschnitt_Variante_date$treatment 
   theme(axis.text.x = element_text(size = 10),
         axis.ticks.x=element_line(size=0.5),
         legend.title=element_blank(),
-        legend.position="right",
+        legend.position="none",
         legend.text = element_text(size = 12),
         legend.spacing.x = unit(0.2, 'cm'),
         axis.title.x = element_text(size = 12),
@@ -288,7 +260,7 @@ g <- ggplot(Durchschnitt_Variante_date [(  Durchschnitt_Variante_date$treatment 
   theme(axis.text.x = element_text(size = 10),
         axis.ticks.x=element_line(size=0.5),
         legend.title=element_blank(),
-        legend.position="right",
+        legend.position="none",
         legend.text = element_text(size = 12),
         legend.spacing.x = unit(0.2, 'cm'),
         axis.title.x = element_text(size = 12),
@@ -319,7 +291,7 @@ h <- ggplot(Durchschnitt_Variante_date [(  Durchschnitt_Variante_date$treatment 
   theme(axis.text.x = element_text(size = 10),
         axis.ticks.x=element_line(size=0.5),
         legend.title=element_blank(),
-        legend.position="right",
+        legend.position="none",
         legend.text = element_text(size = 12),
         legend.spacing.x = unit(0.2, 'cm'),
         axis.title.x = element_text(size = 12),
@@ -328,7 +300,7 @@ h <- ggplot(Durchschnitt_Variante_date [(  Durchschnitt_Variante_date$treatment 
         plot.title = element_text(size = 15, vjust = -115, hjust = 0.99))
 h
 
-C <- ggarrange(e, f, g, h, ncol = 4, nrow = 1, common.legend = TRUE, legend = "bottom")
+C <- ggarrange(e, f, g, h, ncol = 4, nrow = 1)
 C
 
 #N
@@ -371,7 +343,7 @@ i <- ggplot(Durchschnitt_Variante_date [(  Durchschnitt_Variante_date$treatment 
   theme(axis.text.x = element_text(size = 10),
         axis.ticks.x=element_line(size=0.5),
         legend.title=element_blank(),
-        legend.position="right",
+        legend.position="none",
         legend.text = element_text(size = 12),
         legend.spacing.x = unit(0.2, 'cm'),
         axis.title.x = element_text(size = 12),
@@ -402,7 +374,7 @@ j <- ggplot(Durchschnitt_Variante_date [(  Durchschnitt_Variante_date$treatment 
   theme(axis.text.x = element_text(size = 10),
         axis.ticks.x=element_line(size=0.5),
         legend.title=element_blank(),
-        legend.position="right",
+        legend.position="none",
         legend.text = element_text(size = 12),
         legend.spacing.x = unit(0.2, 'cm'),
         axis.title.x = element_text(size = 12),
@@ -433,7 +405,7 @@ k <- ggplot(Durchschnitt_Variante_date [(  Durchschnitt_Variante_date$treatment 
   theme(axis.text.x = element_text(size = 10),
         axis.ticks.x=element_line(size=0.5),
         legend.title=element_blank(),
-        legend.position="right",
+        legend.position="none",
         legend.text = element_text(size = 12),
         legend.spacing.x = unit(0.2, 'cm'),
         axis.title.x = element_text(size = 12),
@@ -464,7 +436,7 @@ l <- ggplot(Durchschnitt_Variante_date [(  Durchschnitt_Variante_date$treatment 
   theme(axis.text.x = element_text(size = 10),
         axis.ticks.x=element_line(size=0.5),
         legend.title=element_blank(),
-        legend.position="right",
+        legend.position="none",
         legend.text = element_text(size = 12),
         legend.spacing.x = unit(0.2, 'cm'),
         axis.title.x = element_text(size = 12),
@@ -473,7 +445,7 @@ l <- ggplot(Durchschnitt_Variante_date [(  Durchschnitt_Variante_date$treatment 
         plot.title = element_text(size = 15, vjust = -115, hjust = 0.99))
 l
 
-N <- ggarrange(i, j, k, l, ncol = 4, nrow = 1, common.legend = TRUE, legend = "bottom")
+N <- ggarrange(i, j, k, l, ncol = 4, nrow = 1)
 N
 
 
@@ -517,7 +489,7 @@ m <- ggplot(Durchschnitt_Variante_date [(  Durchschnitt_Variante_date$treatment 
   theme(axis.text.x = element_text(size = 10),
         axis.ticks.x=element_line(size=0.5),
         legend.title=element_blank(),
-        legend.position="right",
+        legend.position="none",
         legend.text = element_text(size = 12),
         legend.spacing.x = unit(0.2, 'cm'),
         axis.title.x = element_text(size = 12),
@@ -548,7 +520,7 @@ n <- ggplot(Durchschnitt_Variante_date [(  Durchschnitt_Variante_date$treatment 
   theme(axis.text.x = element_text(size = 10),
         axis.ticks.x=element_line(size=0.5),
         legend.title=element_blank(),
-        legend.position="right",
+        legend.position="none",
         legend.text = element_text(size = 12),
         legend.spacing.x = unit(0.2, 'cm'),
         axis.title.x = element_text(size = 12),
@@ -579,7 +551,7 @@ o <- ggplot(Durchschnitt_Variante_date [(  Durchschnitt_Variante_date$treatment 
   theme(axis.text.x = element_text(size = 10),
         axis.ticks.x=element_line(size=0.5),
         legend.title=element_blank(),
-        legend.position="right",
+        legend.position="none",
         legend.text = element_text(size = 12),
         legend.spacing.x = unit(0.2, 'cm'),
         axis.title.x = element_text(size = 12),
@@ -610,7 +582,7 @@ p <- ggplot(Durchschnitt_Variante_date [(  Durchschnitt_Variante_date$treatment 
   theme(axis.text.x = element_text(size = 10),
         axis.ticks.x=element_line(size=0.5),
         legend.title=element_blank(),
-        legend.position="right",
+        legend.position="none",
         legend.text = element_text(size = 12),
         legend.spacing.x = unit(0.2, 'cm'),
         axis.title.x = element_text(size = 12),
@@ -619,7 +591,7 @@ p <- ggplot(Durchschnitt_Variante_date [(  Durchschnitt_Variante_date$treatment 
         plot.title = element_text(size = 15, vjust = -115, hjust = 0.99))
 p
 
-P <- ggarrange(m, n, o, p, ncol = 4, nrow = 1, common.legend = TRUE, legend = "bottom")
+P <- ggarrange(m, n, o, p, ncol = 4, nrow = 1)
 P
 
 ggarrange(C, P, N, K, ncol = 1, nrow = 4, common.legend = TRUE, legend = "bottom")
