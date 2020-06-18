@@ -7,13 +7,15 @@ RLD <- read_delim("RLD3.csv", ";", escape_double = FALSE,
                                                  `RLU BP (cm /m^2 in soil depth)` = col_number()), 
                      locale = locale(decimal_mark = ","), 
                        trim_ws = TRUE)
+#wenn ich das nicht so Kompliziert wie obern mache - dann aber probleme mit numeric
 #RLD <-read_delim("RLD3.csv", ";", escape_double = FALSE, 
  #                   trim_ws = TRUE)
 #colnames(RLD)=RLD[3,]
 
 #RLD <- slice(RLD, 5:n())
-RLD[17:33] <- NULL
 
+
+RLD[17:33] <- NULL
 names(RLD)[5]<-"plot"
 names(RLD)[6]<-"field.rep"
 names(RLD)[8] <- "rainout.shelter"
@@ -41,6 +43,8 @@ RLD <- transform(RLD, treatment = as.factor(treatment),
                  rainout.shelter = as.factor(rainout.shelter))
 
 
+#ms <- spross %>% group_by(Year, treatment, rainout.shelter, JDay) %>% 
+#summarise(mean = mean(spross_dm), sd = sd(spross_dm))
 
 
 
