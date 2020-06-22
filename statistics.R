@@ -14,7 +14,7 @@ w <- filter(Rohdaten_shoot, treatment == 6)
 
 qw <- bind_rows(q, w)
 
-ms1 <- transform(ms1, treatment = as.factor(treatment))
+qw <- transform(qw, treatment = as.factor(treatment))
 
 shapiro.test(q$DM_mean)
 shapiro.test(w$DM_mean)
