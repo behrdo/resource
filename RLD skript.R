@@ -145,42 +145,7 @@ RLDP$percentage <- as.numeric(RLDP$percentage)
       theme_bw()
 
 
-# for different depth <30 / >30 at last sampling date--------------------------------------------------
 
-  u30 <- filter(RLD, depth <=30)
-  o30 <- filter(RLD, depth >=30)
-  frames = c(u30, o30)
-  RL30 <- pd.concat (frames, keys =c("<30",">30") )
-  
-  u30 <- filter(RLD, depth <=30)
-  o30 <- filter(RLD, depth >=30)
-  # add colomn that distinguishes <30 / >30
-  
-  u30 <- u30 %>% group_by(JDay, Year, treatment, rainout.shelter) %>% 
-    summarise(tot_m2=sum(tot_m2), blk_m2=sum(blk_m2), BP_m2=sum(BP_m2))
-  o30 <- o30 %>% group_by(JDay, Year, treatment, rainout.shelter) %>% 
-    summarise(tot_m2=sum(tot_m2), blk_m2=sum(blk_m2), BP_m2=sum(BP_m2))
-  
-  
-  RL30 <- gather(RL30, "blk_m2", "BP_m2", key = "pore_kind", value = "m2")
-  
-  ggplot(RL30, aes(x = depth, y = m2, colour = interaction(rainout.shelter, treatment),
-                   group = interaction(treatment, rainout.shelter))) + 
-    geom_point() + geom_line() +
-    facet_grid(cols = vars(Year)) +
-    scale_colour_manual(values = c("brown4", "steelblue4", "brown2", "steelblue2"), name = "Treatment")+
-    #labels = c("RS2 rain shelter", "RS2 rainfed", "WW2 rain shelter", "WW2 rainfed")) +
-    #labs(x = "Day Number", y = "Rootlength [m  " ~m^2 ~"]", title = "Total Rootlegnth") +
-    theme_bw() +
-    scale_x_reverse(breaks=c(1,2,3,4))+
-    coord_flip()+
-    theme(axis.text = element_text(size = 10), 
-          axis.title = element_text(size = 11), 
-          plot.title = element_text(size = 15), 
-          strip.text.y = element_text(size = 10), 
-          strip.text.x = element_text(size = 10)) + 
-    theme_bw()
-  
   
   
   
