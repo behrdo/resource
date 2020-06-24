@@ -103,6 +103,7 @@ nutr <- nutr %>% group_by(treatment, treatm) %>%
             mean_p = mean(P_mean), sd_p = sd(P_mean), 
             mean_k = mean(K_mean), sd_k = sd(K_mean))
 
+#right unit???!!!!
 c <- ggplot(nutr, aes(x = treatm, y = mean_n, fill = treatm)) +
   geom_bar(stat = "identity", position = position_dodge(), colour = "black") + 
   geom_errorbar(aes(ymin = mean_n-sd_n, ymax = mean_n+sd_n), width=.2,
@@ -155,7 +156,6 @@ e <- ggplot(nutr, aes(x = treatm, y = mean_k, fill = treatm)) +
 e
 
 cde <- ggarrange(c, d, e, nrow = 1)
-
 ggarrange(ab, cde, nrow = 2)
 
 #main crops - dry matter #### 
