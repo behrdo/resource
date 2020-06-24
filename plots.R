@@ -4,8 +4,7 @@ library(gridExtra)
 library(ggpubr)
 library(lme4)
 library(chillR)
-
-#biopores
+#precrops - biopores ####
 biopore <- read_excel("data_Trial_C_2020_05_12.xlsx", 
                       sheet = "biopores")
 
@@ -13,7 +12,7 @@ biopore <- read_excel("data_Trial_C_2020_05_12.xlsx",
 biopore[12:21] <- NULL
 biopore[6] <- NULL
 
-biopore <- transform(biopore, treatment = as.factor(treatment))
+biopore <- transform(biopore, treatment = as.character(treatment))
 
 names(biopore)[8] <- "2.5mm"
 names(biopore)[9] <- "5mm"
@@ -28,17 +27,12 @@ df <- select(df, "treatment", "2.5mm", "5mm")
 
 df <- gather(df, "2.5mm", "5mm", key = "depth", value = "pores")
 
-#plotting
-ggplot(df, aes(x = treatment, y = pores, fill = depth)) +
-  geom_bar(stat = "identity") + 
-  theme_bw()
-
-ggplot(df, aes(x = treatment, y = pores, fill = depth)) +
-  geom_bar(stat = "identity", position = position_dodge()) + 
-  theme_bw()
-
 ms <- df %>% group_by(treatment, depth) %>% summarise(mean = mean(pores), sd = sd(pores))
 
+ms$treatment[ms$treatment == "5"] <- "Ch"
+ms$treatment[ms$treatment == "6"] <- "Fe"
+
+#plotting
 a <- ggplot(ms, aes(x = depth, y = mean, fill = treatment)) +
   geom_bar(stat = "identity", position = position_dodge(), colour = "black") + 
   geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd), width=.2,
@@ -53,10 +47,10 @@ a <- ggplot(ms, aes(x = depth, y = mean, fill = treatment)) +
         plot.title = element_text(size = 15, vjust = -10, hjust = 0.03), 
         strip.text.y = element_text(size = 10), 
         strip.text.x = element_text(size = 10), 
-        legend.position = c(0.8, 0.85))
+        legend.position = c(0.8, 0.80))
 a
 
-#dry matter
+#precrops - dry matter ####
 Rohdaten_shoot <- read.csv2("precrop data C.csv")
 
 ms1 <- Rohdaten_shoot %>% group_by(treatment) %>% summarise(mean = mean(DM_mean), sd = sd(DM_mean))
@@ -66,7 +60,10 @@ ms3 <- filter(ms1, treatment == 6)
 
 ms1 <- bind_rows(ms2, ms3)
 
-ms1 <- transform(ms1, treatment = as.factor(treatment))
+ms1 <- transform(ms1, treatment = as.character(treatment))
+
+ms1$treatment[ms1$treatment == "5"] <- "Ch"
+ms1$treatment[ms1$treatment == "6"] <- "Fe"
 
 b <- ggplot(ms1, aes(x = treatment, y = mean, fill = treatment)) +
   geom_bar(stat = "identity", position = position_dodge(), colour = "black") + 
@@ -74,7 +71,7 @@ b <- ggplot(ms1, aes(x = treatment, y = mean, fill = treatment)) +
                 position=position_dodge(.9)) +
   scale_fill_manual(values = c("red3", "#0072B2")) +
   labs(x = "Treatment", 
-       y = bquote("Mean dry matter [kg  " ~ha^-1 ~"]"),
+       y = bquote("Mean dry matter [kg * " ~ha^-1 ~"]"),
        title = "B") + 
   theme_bw() +
   theme(axis.text = element_text(size = 10), 
@@ -85,11 +82,83 @@ b <- ggplot(ms1, aes(x = treatment, y = mean, fill = treatment)) +
         legend.position = "none")
 b
 
-ggarrange(a, b, ncol = 2, nrow = 1)
+ab <- ggarrange(a, b, ncol = 2, nrow = 1)
+ab
+#precrops - nutrients ####
+Rohdaten_shoot <- read.csv2("precrop data C.csv")
 
+nutr1 <- filter(Rohdaten_shoot, treatment == 5)
+nutr2 <- filter(Rohdaten_shoot, treatment == 6)
 
+nutr <- bind_rows(nutr1, nutr2)
 
-#sprossdaten unsere plots: 
+nutr$treatm[nutr$treatm == "Ch2"] <- "Ch"
+nutr$treatm[nutr$treatm == "Fe2"] <- "Fe"
+
+nutr[11] <- NULL
+nutr[7] <- NULL
+
+nutr <- nutr %>% group_by(treatment, treatm) %>% 
+  summarise(mean_n = mean(N_mean), sd_n = sd(N_mean), 
+            mean_p = mean(P_mean), sd_p = sd(P_mean), 
+            mean_k = mean(K_mean), sd_k = sd(K_mean))
+
+c <- ggplot(nutr, aes(x = treatm, y = mean_n, fill = treatm)) +
+  geom_bar(stat = "identity", position = position_dodge(), colour = "black") + 
+  geom_errorbar(aes(ymin = mean_n-sd_n, ymax = mean_n+sd_n), width=.2,
+                position=position_dodge(.9)) +
+  scale_fill_manual(values = c("red3", "#0072B2")) +
+  labs(x = "Treatment", 
+       y = bquote("Mean N uptake [g * " ~kg^-1 ~"DM]"),
+       title = "C") + 
+  theme_bw() +
+  theme(axis.text = element_text(size = 10), 
+        axis.title = element_text(size = 11), 
+        plot.title = element_text(size = 15, vjust = -10, hjust = 0.03), 
+        strip.text.y = element_text(size = 10), 
+        strip.text.x = element_text(size = 10), 
+        legend.position = "none")
+c
+
+d <- ggplot(nutr, aes(x = treatm, y = mean_p, fill = treatm)) +
+  geom_bar(stat = "identity", position = position_dodge(), colour = "black") + 
+  geom_errorbar(aes(ymin = mean_p-sd_p, ymax = mean_p+sd_p), width=.2,
+                position=position_dodge(.9)) +
+  scale_fill_manual(values = c("red3", "#0072B2")) +
+  labs(x = "Treatment", 
+       y = bquote("Mean P uptake [g * " ~kg^-1 ~"DM]"),
+       title = "D") + 
+  theme_bw() +
+  theme(axis.text = element_text(size = 10), 
+        axis.title = element_text(size = 11), 
+        plot.title = element_text(size = 15, vjust = -10, hjust = 0.03), 
+        strip.text.y = element_text(size = 10), 
+        strip.text.x = element_text(size = 10), 
+        legend.position = "none")
+d
+
+e <- ggplot(nutr, aes(x = treatm, y = mean_k, fill = treatm)) +
+  geom_bar(stat = "identity", position = position_dodge(), colour = "black") + 
+  geom_errorbar(aes(ymin = mean_k-sd_k, ymax = mean_k+sd_k), width=.2,
+                position=position_dodge(.9)) +
+  scale_fill_manual(values = c("red3", "#0072B2")) +
+  labs(x = "Treatment", 
+       y = bquote("Mean K uptake [g * " ~kg^-1 ~"DM]"),
+       title = "E") + 
+  theme_bw() +
+  theme(axis.text = element_text(size = 10), 
+        axis.title = element_text(size = 11), 
+        plot.title = element_text(size = 15, vjust = -10, hjust = 0.03), 
+        strip.text.y = element_text(size = 10), 
+        strip.text.x = element_text(size = 10), 
+        legend.position = "none")
+e
+
+cde <- ggarrange(c, d, e, nrow = 1)
+
+ggarrange(ab, cde, nrow = 2)
+
+#main crops - dry matter #### 
 #5, 7, 17, 19 sind treatment ww2
 #6, 8, 16, 21 sind rs2
 

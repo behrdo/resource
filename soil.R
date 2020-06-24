@@ -8,7 +8,7 @@ library(ggpubr)
 Rohdaten_soil <- read.csv2("soil data C.csv")
 
 
-#facet_grit #####
+#facet_grid #####
 #1. changing the data frame into something i can plot
 Rohdaten_soil <- transform(Rohdaten_soil, date = as.factor(date), 
                            treatment = as.factor(treatment), 
