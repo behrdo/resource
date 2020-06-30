@@ -7,7 +7,7 @@ library(chillR)
 
 Rohdaten_shoot <- read.csv2("precrop data C.csv")
 
-#statistical analysis for dry matter
+#dry matter ####
 #checking for normality
 q <- filter(Rohdaten_shoot, treatment == 5)
 w <- filter(Rohdaten_shoot, treatment == 6)
@@ -39,7 +39,7 @@ anova(model1, model2)
 #model1 is better than model2 -> treatment has an impact on DM_mean,
 #which however is not significant (p = 0.1604) -> similar p value as in the t-test
 
-#statistical analysis for biopores
+#biopores ####
 #1. changing the dataframe into something i can work with :D
 biopore <- read_excel("data_Trial_C_2020_05_12.xlsx", 
                       sheet = "biopores")
@@ -99,8 +99,80 @@ summary(model1)
 anova(model1, model2)
 #p-value: 0.3812 -> the treatment has no significant effect on the Biopores gesamt
 
+#precrop nutrients ####
+Rohdaten_shoot <- read.csv2("precrop data C.csv")
 
-#statistics for dry matter at last harvest - two way anova
+nutr1 <- filter(Rohdaten_shoot, treatment == 5)
+nutr2 <- filter(Rohdaten_shoot, treatment == 6)
+
+nutr <- bind_rows(nutr1, nutr2)
+
+nutr$treatm[nutr$treatm == "Ch2"] <- "Ch"
+nutr$treatm[nutr$treatm == "Fe2"] <- "Fe"
+
+nutr[11] <- NULL
+nutr[7] <- NULL
+
+#one way anova - N
+model1 <- lm(N_mean ~ treatment, data = nutr)
+summary(model1)
+
+model2 <- lm(N_mean ~ 1, data = nutr)
+summary(model2)
+
+anova(model1, model2)
+#p-value: 0.3963 -> the treatment has no significant effect
+#but are they even nd? ->
+par(mfrow = c(2, 2))
+plot(model1)
+plot(model2)
+par(mfrow = c(1, 1))
+#jup i would say so
+
+#two way anova, introducing fieldrep as a random factor
+model1 <- lmer(N_mean ~ treatment + (1|fieldrep), data = nutr)
+summary(model1)
+#the variance dependent on fieldrep is much higher than the residual variance
+
+model2 <- lmer(N_mean ~ (1|fieldrep), data = nutr)
+summary(model1)
+
+anova(model1, model2)
+#p-value: 0.04344 -> the N content of the two precrops is significantly different
+
+#one way anova - P
+model1 <- lm(P_mean ~ treatment, data = nutr)
+summary(model1)
+
+model2 <- lm(P_mean ~ 1, data = nutr)
+summary(model2)
+
+anova(model1, model2)
+#p-value: 0.02593 -> the P content of the two precrops is significantly different
+#but are they even nd? ->
+par(mfrow = c(2, 2))
+plot(model1)
+plot(model2)
+par(mfrow = c(1, 1))
+#jup i would say so
+
+#one way anova - K
+model1 <- lm(K_mean ~ treatment, data = nutr)
+summary(model1)
+
+model2 <- lm(K_mean ~ 1, data = nutr)
+summary(model2)
+
+anova(model1, model2)
+#p-value: 0.02621 -> the K content of the two precrops is significantly different
+#but are they even nd? ->
+par(mfrow = c(2, 2))
+plot(model1)
+plot(model2)
+par(mfrow = c(1, 1))
+#jup i would say so
+
+#dry matter at last harvest - two way anova ####
 #1. preparing data frame
 spross <- read_excel("data Trial C_2020_06_10_naemi.xlsx", 
                      sheet = "PlantNutrients Bearbeitet", 
@@ -158,7 +230,7 @@ oats <- filter(spross, crop == "oats")
 
 s_osr[5] <- NULL
 
-#anova for 2014/spring barley
+#2014/spring barley ####
 #one way anova
 model1 <- lm(spross_dm ~ treatment, data = s_barley)
 summary(model1)
@@ -175,7 +247,7 @@ plot(model2)
 par(mfrow = c(1, 1))
 #jup i would say so
 
-#anova for 2015/spring oil seed rape
+#2015/spring oil seed rape ####
 #two way anova, with treatment and rainout shelter as main effects
 model1 <- lm(spross_dm ~ treatment*rainout.shelter, data = s_osr)
 summary(model1)
@@ -224,7 +296,7 @@ anova(model1, model2)
 #p-value: 0.3963 -> no significant effect
 #conclusions: no significant effect of either the fixed or the random effects on the DM
 
-#anova for 2016/winter barley
+#2016/winter barley ####
 #two way anova, with treatment and rainout shelter as main effects
 model1 <- lm(spross_dm ~ treatment*rainout.shelter, data = w_barley)
 summary(model1)
@@ -249,7 +321,7 @@ plot(model2)
 par(mfrow = c(1, 1))
 #jup i would say so
 
-#anova for 2017/oats
+#2017/oats ####
 #two-way anova with treatment and rainout shelter as fixed effects
 model1 <- lm(spross_dm ~ treatment*rainout.shelter, data = oats)
 summary(model1)

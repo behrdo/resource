@@ -6,6 +6,7 @@ library(ggpubr)
 library(lme4)
 library(chillR)
 
+#water balance ####
 #first attempt with the mean data
 alles <- read_excel("years_stat korrig.xlsx")
 
@@ -36,7 +37,629 @@ ggplot(alles, aes(x = Jahr, y = wasserbilanz)) +
         strip.text.x = element_text(size = 10), 
         legend.position = c(0.8, 0.85))
 
+#soil water content ####
+#creating a data frame of 2015
+wasser<- read_delim("soil water C.csv", ";", escape_double = FALSE, 
+                    col_types = cols(VWC = col_number(), VWC_gilt = col_number()), trim_ws = TRUE)
 
+wasser <- wasser[complete.cases(wasser[ , 10:12]),]
+
+wasser <- transform(wasser, VWC = as.numeric(VWC), 
+                    VWC_gilt = as.numeric(VWC_gilt))
+
+wasser <- mutate(wasser, VWC = VWC/100, VWC_gilt = VWC_gilt/1000)
+
+mw15 <- wasser %>%  group_by(date_no, trtcomb, depth) %>%
+  summarise(Anzahl_Parzellen = length(VWC), 
+            mean_Parameter = mean(VWC, na.rm=TRUE), 
+            SD_Parameter = sd(VWC, na.rm=TRUE))
+
+mw15 <- na.omit(mw)
+
+mw15$trtcomb[mw15$trtcomb == "1"] <- "Fe Rainfed" #fe=6
+mw15$trtcomb[mw15$trtcomb == "2"] <- "Ch Rainfed" #ch=5
+mw15$trtcomb[mw15$trtcomb == "3"] <- "Fe Rain Shelter" #fe=6
+mw15$trtcomb[mw15$trtcomb == "4"] <- "Ch Rain Shelter" #ch=5
+
+#creating a dataframe for 2016 ####
+wa16  <- read_excel("2016_AVR_VWC.xlsx")
+
+wa16 <- separate(wa16, Date, sep = "-", into =c("Year", "Month", "Day"))
+wa16 <- make_JDay(wa16)
+
+wa16 <- unite(wa16, Year, Month, Day, col = "Date", sep = "-")
+
+#plot 16
+p16a <- select(wa16, Date, JDay, "16-A-W15", "16-A-W45", "16-A-W75", "16-A-W105", "16-A-W135", "16-A-W165",
+              "16-A-W195")
+
+p16b <- select(wa16, Date, JDay, "16-B-W15", "16-B-W45", "16-B-W75", "16-B-W105", "16-B-W135", "16-B-W165",
+              "16-B-W195")
+
+p16a <- p16a[,c(1,3,4,5,6,7,8,9,2)]
+p16b <- p16b[,c(1,3,4,5,6,7,8,9,2)]
+
+p16a[3] <- NULL
+p16b[4] <- NULL
+
+names(p16a)[2] <- "15"
+names(p16a)[3] <- "75"
+names(p16a)[4] <- "105"
+names(p16a)[5] <- "135"
+names(p16a)[6] <- "165"
+names(p16a)[7] <- "195"
+
+p16a <- gather(p16a, "15", "75", "105", "135", "165", "195", key = "depth", value = "VWC")
+p16a$treatment <- rep(6, nrow(p16a))
+p16a$rainshelter <- rep("without", nrow(p16a))
+p16a$trtcomp <- rep(1, nrow(p16a))
+
+names(p16b)[2] <- "15"
+names(p16b)[3] <- "45"
+names(p16b)[4] <- "105"
+names(p16b)[5] <- "135"
+names(p16b)[6] <- "165"
+names(p16b)[7] <- "195"
+
+p16b <- gather(p16b, "15", "45", "105", "135", "165", "195", key = "depth", value = "VWC")
+p16b$treatment <- rep(6, nrow(p16b))
+p16b$rainshelter <- rep("with", nrow(p16b))
+p16b$trtcomp <- rep(3, nrow(p16b))
+
+p16a$VWC <- as.numeric(p16a$VWC)
+p16b$VWC <- as.numeric(p16b$VWC)
+
+p16a <- drop_na(p16a)
+p16b <- drop_na(p16b)
+
+p16 <- bind_rows(p16a, p16b)
+p16$plot <- rep(16, nrow(p16))
+
+#plot 17
+p17a <- select(wa16, Date, JDay, "17-A-W15", "17-A-W45", "17-A-W75", "17-A-W105", "17-A-W135", "17-A-W165",
+               "17-A-W195")
+
+p17b <- select(wa16, Date, JDay, "17-B-W15", "17-B-W45", "17-B-W75", "17-B-W105", "17-B-W135", "17-B-W165",
+               "17-B-W195")
+
+p17a <- p17a[,c(1,3,4,5,6,7,8,9,2)]
+p17b <- p17b[,c(1,3,4,5,6,7,8,9,2)]
+
+p17b[5] <- NULL
+
+names(p17a)[2] <- "15"
+names(p17a)[3] <- "45"
+names(p17a)[4] <- "75"
+names(p17a)[5] <- "105"
+names(p17a)[6] <- "135"
+names(p17a)[7] <- "165"
+names(p17a)[8] <- "195"
+
+p17a <- gather(p17a, "15", "45", "75", "105", "135", "165", "195", key = "depth", value = "VWC")
+p17a$treatment <- rep(5, nrow(p17a))
+p17a$rainshelter <- rep("without", nrow(p17a))
+p17a$trtcomp <- rep(2, nrow(p17a))
+
+names(p17b)[2] <- "15"
+names(p17b)[3] <- "45"
+names(p17b)[4] <- "75"
+names(p17b)[5] <- "135"
+names(p17b)[6] <- "165"
+names(p17b)[7] <- "195"
+
+p17b <- gather(p17b, "15", "45", "75", "135", "165", "195", key = "depth", value = "VWC")
+p17b$treatment <- rep(5, nrow(p17b))
+p17b$rainshelter <- rep("with", nrow(p17b))
+p17b$trtcomp <- rep(4, nrow(p17b))
+
+p17a$VWC <- as.numeric(p17a$VWC)
+p17b$VWC <- as.numeric(p17b$VWC)
+
+p17a <- drop_na(p17a)
+p17b <- drop_na(p17b)
+
+p17 <- bind_rows(p17a, p17b)
+p17$plot <- rep(17, nrow(p17))
+
+#plot 19
+p19a <- select(wa16, Date, JDay, "19-A-W15", "19-A-W45", "19-A-W75", "19-A-W105", "19-A-W135", "19-A-W165",
+               "19-A-W195")
+
+p19b <- select(wa16, Date, JDay, "19-B-W15", "19-B-W45", "19-B-W75", "19-B-W105", "19-B-W135", "19-B-W165",
+               "19-B-W195")
+
+p19a <- p19a[,c(1,3,4,5,6,7,8,9,2)]
+p19b <- p19b[,c(1,3,4,5,6,7,8,9,2)]
+
+p19a[6] <- NULL
+
+names(p19a)[2] <- "15"
+names(p19a)[3] <- "45"
+names(p19a)[4] <- "75"
+names(p19a)[5] <- "105"
+names(p19a)[6] <- "165"
+names(p19a)[7] <- "195"
+
+p19a <- gather(p19a, "15", "45", "75", "105", "165", "195", key = "depth", value = "VWC")
+p19a$treatment <- rep(5, nrow(p19a))
+p19a$rainshelter <- rep("without", nrow(p19a))
+p19a$trtcomp <- rep(2, nrow(p19a))
+
+names(p19b)[2] <- "15"
+names(p19b)[3] <- "45"
+names(p19b)[4] <- "75"
+names(p19b)[5] <- "105"
+names(p19b)[6] <- "135"
+names(p19b)[7] <- "165"
+names(p19b)[8] <- "195"
+
+p19b <- gather(p19b, "15", "45", "75", "105", "135", "165", "195", key = "depth", value = "VWC")
+p19b$treatment <- rep(5, nrow(p19b))
+p19b$rainshelter <- rep("with", nrow(p19b))
+p19b$trtcomp <- rep(4, nrow(p19b))
+
+p19a$VWC <- as.numeric(p19a$VWC)
+p19b$VWC <- as.numeric(p19b$VWC)
+
+p19a <- drop_na(p19a)
+p19b <- drop_na(p19b)
+
+p19 <- bind_rows(p19a, p19b)
+p19$plot <- rep(19, nrow(p19))
+
+#plot 21
+p21a <- select(wa16, Date, JDay, "21-A-W15", "21-A-W45", "21-A-W75", "21-A-W105", "21-A-W135", "21-A-W165",
+               "21-A-W195")
+
+p21b <- select(wa16, Date, JDay, "21-B-W15", "21-B-W45", "21-B-W75", "21-B-W105", "21-B-W135", "21-B-W165",
+               "21-B-W195")
+
+p21a <- p21a[,c(1,3,4,5,6,7,8,9,2)]
+p21b <- p21b[,c(1,3,4,5,6,7,8,9,2)]
+
+p21a[5] <- NULL
+
+names(p21a)[2] <- "15"
+names(p21a)[3] <- "45"
+names(p21a)[4] <- "75"
+names(p21a)[5] <- "135"
+names(p21a)[6] <- "165"
+names(p21a)[7] <- "195"
+
+p21a <- gather(p21a, "15", "45", "75", "135", "165", "195", key = "depth", value = "VWC")
+p21a$treatment <- rep(6, nrow(p21a))
+p21a$rainshelter <- rep("without", nrow(p21a))
+p21a$trtcomp <- rep(1, nrow(p21a))
+
+names(p21b)[2] <- "15"
+names(p21b)[3] <- "45"
+names(p21b)[4] <- "75"
+names(p21b)[5] <- "105"
+names(p21b)[6] <- "135"
+names(p21b)[7] <- "165"
+names(p21b)[8] <- "195"
+
+p21b <- gather(p21b, "15", "45", "75", "105", "135", "165", "195", key = "depth", value = "VWC")
+p21b$treatment <- rep(6, nrow(p21b))
+p21b$rainshelter <- rep("with", nrow(p21b))
+p21b$trtcomp <- rep(3, nrow(p21b))
+
+p21a$VWC <- as.numeric(p21a$VWC)
+p21b$VWC <- as.numeric(p21b$VWC)
+
+p21a <- drop_na(p21a)
+p21b <- drop_na(p21b)
+
+p21 <- bind_rows(p21a, p21b)
+p21$plot <- rep(21, nrow(p21))
+
+#plot 7
+p7a <- select(wa16, Date, JDay, "7-A-W15", "7-A-W45", "7-A-W75", "7-A-W105", "7-A-W135", "7-A-W165",
+               "7-A-W195")
+
+p7b <- select(wa16, Date, JDay, "7-B-W15", "7-B-W45", "7-B-W75", "7-B-W105", "7-B-W135", "7-B-W165",
+               "7-B-W195")
+
+p7a <- p7a[,c(1,3,4,5,6,7,8,9,2)]
+p7b <- p7b[,c(1,3,4,5,6,7,8,9,2)]
+
+p7a[4] <- NULL
+
+names(p7a)[2] <- "15"
+names(p7a)[3] <- "45"
+names(p7a)[4] <- "105"
+names(p7a)[5] <- "135"
+names(p7a)[6] <- "165"
+names(p7a)[7] <- "195"
+
+p7a <- gather(p7a, "15", "45", "105", "135", "165", "195", key = "depth", value = "VWC")
+p7a$treatment <- rep(5, nrow(p7a))
+p7a$rainshelter <- rep("without", nrow(p7a))
+p7a$trtcomp <- rep(2, nrow(p7a))
+
+names(p7b)[2] <- "15"
+names(p7b)[3] <- "45"
+names(p7b)[4] <- "75"
+names(p7b)[5] <- "105"
+names(p7b)[6] <- "135"
+names(p7b)[7] <- "165"
+names(p7b)[8] <- "195"
+
+p7b <- gather(p7b, "15", "45", "75", "105", "135", "165", "195", key = "depth", value = "VWC")
+p7b$treatment <- rep(5, nrow(p7b))
+p7b$rainshelter <- rep("with", nrow(p7b))
+p7b$trtcomp <- rep(4, nrow(p7b))
+
+p7a$VWC <- as.numeric(p7a$VWC)
+p7b$VWC <- as.numeric(p7b$VWC)
+
+p7a <- drop_na(p7a)
+p7b <- drop_na(p7b)
+
+p7 <- bind_rows(p7a, p7b)
+p7$plot <- rep(7, nrow(p7))
+
+#plot 8
+p8a <- select(wa16, Date, JDay, "8-A-W15", "8-A-W45", "8-A-W75", "8-A-W105", "8-A-W135", "8-A-W165",
+              "8-A-W195")
+
+p8b <- select(wa16, Date, JDay, "8-B-W15", "8-B-W45", "8-B-W75", "8-B-W105", "8-B-W135", "8-B-W165",
+              "8-B-W195")
+
+p8a <- p8a[,c(1,3,4,5,6,7,8,9,2)]
+p8b <- p8b[,c(1,3,4,5,6,7,8,9,2)]
+
+p8b[6] <- NULL
+
+names(p8a)[2] <- "15"
+names(p8a)[3] <- "45"
+names(p8a)[4] <- "75"
+names(p8a)[5] <- "105"
+names(p8a)[6] <- "135"
+names(p8a)[7] <- "165"
+names(p8a)[8] <- "195"
+
+p8a <- gather(p8a, "15", "45", "75", "105", "135", "165", "195", key = "depth", value = "VWC")
+p8a$treatment <- rep(6, nrow(p8a))
+p8a$rainshelter <- rep("without", nrow(p8a))
+p8a$trtcomp <- rep(1, nrow(p8a))
+
+names(p8b)[2] <- "15"
+names(p8b)[3] <- "45"
+names(p8b)[4] <- "75"
+names(p8b)[5] <- "105"
+names(p8b)[6] <- "165"
+names(p8b)[7] <- "195"
+
+p8b <- gather(p8b, "15", "45", "75", "105", "165", "195", key = "depth", value = "VWC")
+p8b$treatment <- rep(6, nrow(p8b))
+p8b$rainshelter <- rep("with", nrow(p8b))
+p8b$trtcomp <- rep(3, nrow(p8b))
+
+p8a$VWC <- as.numeric(p8a$VWC)
+p8b$VWC <- as.numeric(p8b$VWC)
+
+p8a <- drop_na(p8a)
+p8b <- drop_na(p8b)
+
+p8 <- bind_rows(p8a, p8b)
+p8$plot <- rep(8, nrow(p8))
+
+#all together 2016
+wasser16 <- bind_rows(p7, p8, p16, p17, p19, p21)
+
+#creating a dataframe for 2017 ####
+wa17 <- read_excel("2017_AVR_VWC.xlsx")
+
+wa17 <- separate(wa17, Dates, sep = "-", into =c("Year", "Month", "Day"))
+wa17 <- make_JDay(wa17)
+
+wa17 <- unite(wa17, Year, Month, Day, col = "Dates", sep = "-")
+
+#plot 16
+p16a <- select(wa17, Dates, JDay, "16-A-W15", "16-A-W45", "16-A-W75", "16-A-W105", "16-A-W135", "16-A-W165",
+               "16-A-W195")
+
+p16b <- select(wa17, Dates, JDay, "16-B-W15", "16-B-W45", "16-B-W75", "16-B-W105", "16-B-W135", "16-B-W165",
+               "16-B-W195")
+
+p16a <- p16a[,c(1,3,4,5,6,7,8,9,2)]
+p16b <- p16b[,c(1,3,4,5,6,7,8,9,2)]
+
+p16a[3] <- NULL
+p16b[8] <- NULL
+p16b[5] <- NULL
+p16b[4] <- NULL
+
+names(p16a)[2] <- "15"
+names(p16a)[3] <- "75"
+names(p16a)[4] <- "105"
+names(p16a)[5] <- "135"
+names(p16a)[6] <- "165"
+names(p16a)[7] <- "195"
+
+p16a <- gather(p16a, "15", "75", "105", "135", "165", "195", key = "depth", value = "VWC")
+p16a$treatment <- rep(6, nrow(p16a))
+p16a$rainshelter <- rep("without", nrow(p16a))
+p16a$trtcomp <- rep(1, nrow(p16a))
+
+names(p16b)[2] <- "15"
+names(p16b)[3] <- "45"
+names(p16b)[4] <- "135"
+names(p16b)[5] <- "165"
+
+p16b <- gather(p16b, "15", "45", "135", "165", key = "depth", value = "VWC")
+p16b$treatment <- rep(6, nrow(p16b))
+p16b$rainshelter <- rep("with", nrow(p16b))
+p16b$trtcomp <- rep(3, nrow(p16b))
+
+p16a$VWC <- as.numeric(p16a$VWC)
+p16b$VWC <- as.numeric(p16b$VWC)
+
+p16a <- drop_na(p16a)
+p16b <- drop_na(p16b)
+
+p16 <- bind_rows(p16a, p16b)
+p16$plot <- rep(16, nrow(p16))
+
+#plot 17
+p17a <- select(wa17, Dates, JDay, "17-A-W15", "17-A-W45", "17-A-W75", "17-A-W105", "17-A-W135", "17-A-W165",
+               "17-A-W195")
+
+p17b <- select(wa17, Dates, JDay, "17-B-W15", "17-B-W45", "17-B-W75", "17-B-W105", "17-B-W135", "17-B-W165",
+               "17-B-W195")
+
+p17a <- p17a[,c(1,3,4,5,6,7,8,9,2)]
+p17b <- p17b[,c(1,3,4,5,6,7,8,9,2)]
+
+p17b[5] <- NULL
+
+names(p17a)[2] <- "15"
+names(p17a)[3] <- "45"
+names(p17a)[4] <- "75"
+names(p17a)[5] <- "105"
+names(p17a)[6] <- "135"
+names(p17a)[7] <- "165"
+names(p17a)[8] <- "195"
+
+p17a <- gather(p17a, "15", "45", "75", "105", "135", "165", "195", key = "depth", value = "VWC")
+p17a$treatment <- rep(5, nrow(p17a))
+p17a$rainshelter <- rep("without", nrow(p17a))
+p17a$trtcomp <- rep(2, nrow(p17a))
+
+names(p17b)[2] <- "15"
+names(p17b)[3] <- "45"
+names(p17b)[4] <- "75"
+names(p17b)[5] <- "135"
+names(p17b)[6] <- "165"
+names(p17b)[7] <- "195"
+
+p17b <- gather(p17b, "15", "45", "75", "135", "165", "195", key = "depth", value = "VWC")
+p17b$treatment <- rep(5, nrow(p17b))
+p17b$rainshelter <- rep("with", nrow(p17b))
+p17b$trtcomp <- rep(4, nrow(p17b))
+
+p17a$VWC <- as.numeric(p17a$VWC)
+p17b$VWC <- as.numeric(p17b$VWC)
+
+p17a <- drop_na(p17a)
+p17b <- drop_na(p17b)
+
+p17 <- bind_rows(p17a, p17b)
+p17$plot <- rep(17, nrow(p17))
+
+#plot 19
+p19a <- select(wa17, Dates, JDay, "19-A-W15", "19-A-W45", "19-A-W75", "19-A-W105", "19-A-W135", "19-A-W165",
+               "19-A-W195")
+
+p19b <- select(wa17, Dates, JDay, "19-B-W15", "19-B-W45", "19-B-W75", "19-B-W105", "19-B-W135", "19-B-W165",
+               "19-B-W195")
+
+p19a <- p19a[,c(1,3,4,5,6,7,8,9,2)]
+p19b <- p19b[,c(1,3,4,5,6,7,8,9,2)]
+
+p19a[6] <- NULL
+
+names(p19a)[2] <- "15"
+names(p19a)[3] <- "45"
+names(p19a)[4] <- "75"
+names(p19a)[5] <- "105"
+names(p19a)[6] <- "165"
+names(p19a)[7] <- "195"
+
+p19a <- gather(p19a, "15", "45", "75", "105", "165", "195", key = "depth", value = "VWC")
+p19a$treatment <- rep(5, nrow(p19a))
+p19a$rainshelter <- rep("without", nrow(p19a))
+p19a$trtcomp <- rep(2, nrow(p19a))
+
+names(p19b)[2] <- "15"
+names(p19b)[3] <- "45"
+names(p19b)[4] <- "75"
+names(p19b)[5] <- "105"
+names(p19b)[6] <- "135"
+names(p19b)[7] <- "165"
+names(p19b)[8] <- "195"
+
+p19b <- gather(p19b, "15", "45", "75", "105", "135", "165", "195", key = "depth", value = "VWC")
+p19b$treatment <- rep(5, nrow(p19b))
+p19b$rainshelter <- rep("with", nrow(p19b))
+p19b$trtcomp <- rep(4, nrow(p19b))
+
+p19a$VWC <- as.numeric(p19a$VWC)
+p19b$VWC <- as.numeric(p19b$VWC)
+
+p19a <- drop_na(p19a)
+p19b <- drop_na(p19b)
+
+p19 <- bind_rows(p19a, p19b)
+p19$plot <- rep(19, nrow(p19))
+
+#plot 21
+p21a <- select(wa17, Dates, JDay, "21-A-W15", "21-A-W45", "21-A-W75", "21-A-W105", "21-A-W135", "21-A-W165",
+               "21-A-W195")
+
+p21b <- select(wa17, Dates, JDay, "21-B-W15", "21-B-W45", "21-B-W75", "21-B-W105", "21-B-W135", "21-B-W165",
+               "21-B-W195")
+
+p21a <- p21a[,c(1,3,4,5,6,7,8,9,2)]
+p21b <- p21b[,c(1,3,4,5,6,7,8,9,2)]
+
+p21a[5] <- NULL
+
+names(p21a)[2] <- "15"
+names(p21a)[3] <- "45"
+names(p21a)[4] <- "75"
+names(p21a)[5] <- "135"
+names(p21a)[6] <- "165"
+names(p21a)[7] <- "195"
+
+p21a <- gather(p21a, "15", "45", "75", "135", "165", "195", key = "depth", value = "VWC")
+p21a$treatment <- rep(6, nrow(p21a))
+p21a$rainshelter <- rep("without", nrow(p21a))
+p21a$trtcomp <- rep(1, nrow(p21a))
+
+names(p21b)[2] <- "15"
+names(p21b)[3] <- "45"
+names(p21b)[4] <- "75"
+names(p21b)[5] <- "105"
+names(p21b)[6] <- "135"
+names(p21b)[7] <- "165"
+names(p21b)[8] <- "195"
+
+p21b <- gather(p21b, "15", "45", "75", "105", "135", "165", "195", key = "depth", value = "VWC")
+p21b$treatment <- rep(6, nrow(p21b))
+p21b$rainshelter <- rep("with", nrow(p21b))
+p21b$trtcomp <- rep(3, nrow(p21b))
+
+p21a$VWC <- as.numeric(p21a$VWC)
+p21b$VWC <- as.numeric(p21b$VWC)
+
+p21a <- drop_na(p21a)
+p21b <- drop_na(p21b)
+
+p21 <- bind_rows(p21a, p21b)
+p21$plot <- rep(21, nrow(p21))
+
+#plot 7
+p7a <- select(wa17, Dates, JDay, "7-A-W15", "7-A-W45", "7-A-W75", "7-A-W105", "7-A-W135", "7-A-W165",
+              "7-A-W195")
+
+p7b <- select(wa17, Dates, JDay, "7-B-W15", "7-B-W45", "7-B-W75", "7-B-W105", "7-B-W135", "7-B-W165",
+              "7-B-W195")
+
+p7a <- p7a[,c(1,3,4,5,6,7,8,9,2)]
+p7b <- p7b[,c(1,3,4,5,6,7,8,9,2)]
+
+p7a[4] <- NULL
+
+names(p7a)[2] <- "15"
+names(p7a)[3] <- "45"
+names(p7a)[4] <- "105"
+names(p7a)[5] <- "135"
+names(p7a)[6] <- "165"
+names(p7a)[7] <- "195"
+
+p7a <- gather(p7a, "15", "45", "105", "135", "165", "195", key = "depth", value = "VWC")
+p7a$treatment <- rep(5, nrow(p7a))
+p7a$rainshelter <- rep("without", nrow(p7a))
+p7a$trtcomp <- rep(2, nrow(p7a))
+
+names(p7b)[2] <- "15"
+names(p7b)[3] <- "45"
+names(p7b)[4] <- "75"
+names(p7b)[5] <- "105"
+names(p7b)[6] <- "135"
+names(p7b)[7] <- "165"
+names(p7b)[8] <- "195"
+
+p7b <- gather(p7b, "15", "45", "75", "105", "135", "165", "195", key = "depth", value = "VWC")
+p7b$treatment <- rep(5, nrow(p7b))
+p7b$rainshelter <- rep("with", nrow(p7b))
+p7b$trtcomp <- rep(4, nrow(p7b))
+
+p7a$VWC <- as.numeric(p7a$VWC)
+p7b$VWC <- as.numeric(p7b$VWC)
+
+p7a <- drop_na(p7a)
+p7b <- drop_na(p7b)
+
+p7 <- bind_rows(p7a, p7b)
+p7$plot <- rep(7, nrow(p7))
+
+#plot 8
+p8a <- select(wa17, Dates, JDay, "8-A-W15", "8-A-W45", "8-A-W75", "8-A-W105", "8-A-W135", "8-A-W165",
+              "8-A-W195")
+
+p8b <- select(wa17, Dates, JDay, "8-B-W15", "8-B-W45", "8-B-W75", "8-B-W105", "8-B-W135", "8-B-W165",
+              "8-B-W195")
+
+p8a <- p8a[,c(1,3,4,5,6,7,8,9,2)]
+p8b <- p8b[,c(1,3,4,5,6,7,8,9,2)]
+
+p8b[6] <- NULL
+
+names(p8a)[2] <- "15"
+names(p8a)[3] <- "45"
+names(p8a)[4] <- "75"
+names(p8a)[5] <- "105"
+names(p8a)[6] <- "135"
+names(p8a)[7] <- "165"
+names(p8a)[8] <- "195"
+
+p8a <- gather(p8a, "15", "45", "75", "105", "135", "165", "195", key = "depth", value = "VWC")
+p8a$treatment <- rep(6, nrow(p8a))
+p8a$rainshelter <- rep("without", nrow(p8a))
+p8a$trtcomp <- rep(1, nrow(p8a))
+
+names(p8b)[2] <- "15"
+names(p8b)[3] <- "45"
+names(p8b)[4] <- "75"
+names(p8b)[5] <- "105"
+names(p8b)[6] <- "165"
+names(p8b)[7] <- "195"
+
+p8b <- gather(p8b, "15", "45", "75", "105", "165", "195", key = "depth", value = "VWC")
+p8b$treatment <- rep(6, nrow(p8b))
+p8b$rainshelter <- rep("with", nrow(p8b))
+p8b$trtcomp <- rep(3, nrow(p8b))
+
+p8a$VWC <- as.numeric(p8a$VWC)
+p8b$VWC <- as.numeric(p8b$VWC)
+
+p8a <- drop_na(p8a)
+p8b <- drop_na(p8b)
+
+p8 <- bind_rows(p8a, p8b)
+p8$plot <- rep(8, nrow(p8))
+
+#all together 2017
+wasser17 <- bind_rows(p7, p8, p16, p17, p19, p21)
+
+#plotting VWC ####
+#date in wasser ändern (mit jday)
+#alle 3 zusammen fügen
+#mw berechnen
+#plotten
+#fertig :D
+
+mw16 <- wasser16 %>%  group_by(date_no, trtcomb, depth) %>%
+  summarise(Anzahl_Parzellen = length(VWC), 
+            mean_Parameter = mean(VWC, na.rm=TRUE), 
+            SD_Parameter = sd(VWC, na.rm=TRUE))
+
+mw15 <- na.omit(mw)
+
+mw15$trtcomb[mw15$trtcomb == "1"] <- "Fe Rainfed" #fe=6
+mw15$trtcomb[mw15$trtcomb == "2"] <- "Ch Rainfed" #ch=5
+mw15$trtcomb[mw15$trtcomb == "3"] <- "Fe Rain Shelter" #fe=6
+mw15$trtcomb[mw15$trtcomb == "4"] <- "Ch Rain Shelter" #ch=5
+
+
+
+
+
+
+#stuff we probably wont need anymore ####
 #second one with daily data of all the years combined
 #1.1 as boxlots
 days_2013 <- read_excel("days_2013_calc korrig.xlsx")
