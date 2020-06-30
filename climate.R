@@ -653,7 +653,7 @@ df <- df %>% group_by(JDay, Year, trtcomp, depth) %>%
   summarise(Anzahl_Parzellen = length(VWC), 
             mean_VWC= mean(VWC, na.rm=TRUE), 
             sd_VWC = sd(VWC, na.rm=TRUE))
-#there are some values in 2017 that are very high!
+#there are some values in 2017 that are very high! <- decided to exclude them for now
 df <- filter(df, mean_VWC < 1)
 df <- na.omit(df)
 
@@ -662,14 +662,21 @@ df$trtcomp[df$trtcomp == "2"] <- "Ch Rainfed" #ch=5
 df$trtcomp[df$trtcomp == "3"] <- "Fe Rain Shelter" #fe=6
 df$trtcomp[df$trtcomp == "4"] <- "Ch Rain Shelter" #ch=5
 
+df <- transform(df, depth = as.numeric(depth))
 
-
-
-
-
-
-
-
+ggplot(df, aes(x = JDay, y = mean_VWC, color = trtcomp)) + 
+  geom_line() +
+  facet_grid(cols = vars(Year), rows = vars(depth)) +
+  scale_colour_manual(values = c( "olivedrab2", "green3","orange2", "orange4"), 
+                      name = "Treatment")+
+  labs(x = "JDay", y = "Mean Volumetric Water Content [%]") +
+  theme_bw() +
+  theme(axis.text = element_text(size = 10), 
+        axis.title = element_text(size = 11), 
+        plot.title = element_text(size = 15), 
+        strip.text.y = element_text(size = 10), 
+        strip.text.x = element_text(size = 10),
+        legend.position="bottom")
 
 #stuff we probably wont need anymore ####
 #second one with daily data of all the years combined
