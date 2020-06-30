@@ -5,6 +5,7 @@ library(gridExtra)
 library(ggpubr)
 library(lme4)
 library(chillR)
+library(anytime)
 
 #water balance ####
 #first attempt with the mean data
@@ -38,28 +39,34 @@ ggplot(alles, aes(x = Jahr, y = wasserbilanz)) +
         legend.position = c(0.8, 0.85))
 
 #soil water content ####
-#creating a data frame of 2015
-wasser<- read_delim("soil water C.csv", ";", escape_double = FALSE, 
+#creating a data frame for 2015 
+wasser <- read_delim("soil water C.csv", ";", escape_double = FALSE, 
                     col_types = cols(VWC = col_number(), VWC_gilt = col_number()), trim_ws = TRUE)
 
 wasser <- wasser[complete.cases(wasser[ , 10:12]),]
 
 wasser <- transform(wasser, VWC = as.numeric(VWC), 
-                    VWC_gilt = as.numeric(VWC_gilt))
+                    VWC_gilt = as.numeric(VWC_gilt), 
+                    depth = as.character(depth))
 
 wasser <- mutate(wasser, VWC = VWC/100, VWC_gilt = VWC_gilt/1000)
 
-mw15 <- wasser %>%  group_by(date_no, trtcomb, depth) %>%
-  summarise(Anzahl_Parzellen = length(VWC), 
-            mean_Parameter = mean(VWC, na.rm=TRUE), 
-            SD_Parameter = sd(VWC, na.rm=TRUE))
+wasser <- separate(wasser, date, sep = "-", into = c("Year", "Month", "Day"))
 
-mw15 <- na.omit(mw)
+wasser <- make_JDay(wasser)
 
-mw15$trtcomb[mw15$trtcomb == "1"] <- "Fe Rainfed" #fe=6
-mw15$trtcomb[mw15$trtcomb == "2"] <- "Ch Rainfed" #ch=5
-mw15$trtcomb[mw15$trtcomb == "3"] <- "Fe Rain Shelter" #fe=6
-mw15$trtcomb[mw15$trtcomb == "4"] <- "Ch Rain Shelter" #ch=5
+wasser <- unite(wasser, Year, Month, Day, col = "Dates", sep = "-")
+
+wasser[12] <- NULL
+wasser[11] <- NULL
+wasser[9] <- NULL
+wasser[5] <- NULL
+wasser[1] <- NULL
+
+wasser$Year <- rep(2015, nrow(wasser))
+wasser <- wasser[,c(1,8,6,7,3,4,5,2,9)]
+
+names(wasser)[7] <- "trtcomp"
 
 #creating a dataframe for 2016 ####
 wa16  <- read_excel("2016_AVR_VWC.xlsx")
@@ -348,6 +355,9 @@ p8$plot <- rep(8, nrow(p8))
 #all together 2016
 wasser16 <- bind_rows(p7, p8, p16, p17, p19, p21)
 
+names(wasser16)[1] <- "Dates"
+wasser16$Year <- rep(2016, nrow(wasser16))
+
 #creating a dataframe for 2017 ####
 wa17 <- read_excel("2017_AVR_VWC.xlsx")
 
@@ -634,25 +644,27 @@ p8$plot <- rep(8, nrow(p8))
 
 #all together 2017
 wasser17 <- bind_rows(p7, p8, p16, p17, p19, p21)
+wasser17$Year <- rep(2017, nrow(wasser17))
 
 #plotting VWC ####
-#date in wasser ändern (mit jday)
-#alle 3 zusammen fügen
-#mw berechnen
-#plotten
-#fertig :D
+df <- bind_rows(wasser, wasser16, wasser17)
 
-mw16 <- wasser16 %>%  group_by(date_no, trtcomb, depth) %>%
+df <- df %>% group_by(JDay, Year, trtcomp, depth) %>%
   summarise(Anzahl_Parzellen = length(VWC), 
-            mean_Parameter = mean(VWC, na.rm=TRUE), 
-            SD_Parameter = sd(VWC, na.rm=TRUE))
+            mean_VWC= mean(VWC, na.rm=TRUE), 
+            sd_VWC = sd(VWC, na.rm=TRUE))
+#there are some values in 2017 that are very high!
+df <- filter(df, mean_VWC < 1)
+df <- na.omit(df)
 
-mw15 <- na.omit(mw)
+df$trtcomp[df$trtcomp == "1"] <- "Fe Rainfed" #fe=6
+df$trtcomp[df$trtcomp == "2"] <- "Ch Rainfed" #ch=5
+df$trtcomp[df$trtcomp == "3"] <- "Fe Rain Shelter" #fe=6
+df$trtcomp[df$trtcomp == "4"] <- "Ch Rain Shelter" #ch=5
 
-mw15$trtcomb[mw15$trtcomb == "1"] <- "Fe Rainfed" #fe=6
-mw15$trtcomb[mw15$trtcomb == "2"] <- "Ch Rainfed" #ch=5
-mw15$trtcomb[mw15$trtcomb == "3"] <- "Fe Rain Shelter" #fe=6
-mw15$trtcomb[mw15$trtcomb == "4"] <- "Ch Rain Shelter" #ch=5
+
+
+
 
 
 
