@@ -3,6 +3,8 @@ library(readxl)
 library(gridExtra)
 library(ggpubr)
 
+Thema_soil <- theme(panel.background = element_rect(fill = "white"),
+                    axis.line = element_line())
 
 #rohdaten soil
 Rohdaten_soil <- read.csv2("soil data C.csv")
@@ -59,6 +61,8 @@ df2[5:8] <- NULL
 
 df <- cbind(df1, df2[!names(df2) %in% names(df1)])
 
+df <- transform(df, date = as.character(date))
+
 df$date[df$date == "1"] <- "Year 1"
 df$date[df$date == "2"] <- "Year 2"
 df$date[df$date == "3"] <- "Year 3"
@@ -79,6 +83,7 @@ df_n <- filter(df, nutr == "N")
 df_p <- filter(df, nutr == "P")
 
 #2. ploting 
+Farben_Varianten <- c("5" = "red3", "6" = "#0072B2")
 
 w <- ggplot(df_k, aes(x = depth_class, y = mean_nutr, fill = treatment))+
   geom_bar(stat="identity", position="dodge", color="black", size=0.1)+
@@ -93,7 +98,7 @@ w <- ggplot(df_k, aes(x = depth_class, y = mean_nutr, fill = treatment))+
                      labels = c("0", "100", "200", "300", "400", "500"),
                      limits=c(0,500))+
   coord_flip() +
-  scale_color_manual(values = Farben_Varianten, aesthetics = "fill", labels=c("RS2", "WW2"))+
+  scale_color_manual(values = Farben_Varianten, aesthetics = "fill", labels=c("Ch", "Fe"))+
   theme(axis.text.x = element_text(size = 10),
         axis.ticks.x=element_line(size=0.5),
         legend.title=element_blank(),
@@ -119,7 +124,7 @@ x <- ggplot(df_c, aes(x = depth_class, y = mean_nutr, fill = treatment))+
                      labels = c("0", "0.3", "0.6", "0.9", "1.2", "1.5"),
                      limits=c(0,1.6)) +
   coord_flip() +
-  scale_color_manual(values = Farben_Varianten, aesthetics = "fill", labels=c("RS2", "WW2"))+
+  scale_color_manual(values = Farben_Varianten, aesthetics = "fill", labels=c("Ch", "Fe"))+
   theme(axis.text.x = element_text(size = 10),
         axis.ticks.x=element_line(size=0.5),
         legend.title=element_blank(),
@@ -145,7 +150,7 @@ y <- ggplot(df_n, aes(x = depth_class, y = mean_nutr, fill = treatment))+
                      labels = c("0", "0.03", "0.06", "0.09", "0.12", "0.15"),
                      limits=c(0,0.15))+
   coord_flip() +
-  scale_color_manual(values = Farben_Varianten, aesthetics = "fill", labels=c("RS2", "WW2"))+
+  scale_color_manual(values = Farben_Varianten, aesthetics = "fill", labels=c("Ch", "Fe"))+
   theme(axis.text.x = element_text(size = 10),
         axis.ticks.x=element_line(size=0.5),
         legend.title=element_blank(),
@@ -171,7 +176,7 @@ z <- ggplot(df_p, aes(x = depth_class, y = mean_nutr, fill = treatment))+
                      labels = c("0", "30", "60", "90", "120", "150"),
                      limits=c(0,160))+
   coord_flip() +
-  scale_color_manual(values = Farben_Varianten, aesthetics = "fill", labels=c("RS2", "WW2"))+
+  scale_color_manual(values = Farben_Varianten, aesthetics = "fill", labels=c("Ch", "Fe"))+
   theme(axis.text.x = element_text(size = 10),
         axis.ticks.x=element_line(size=0.5),
         legend.title=element_blank(),

@@ -204,8 +204,8 @@ spross <- drop_na(spross, spross_dm)
 ms <- spross %>% group_by(Year, treatment, rainout.shelter, JDay) %>% 
   summarise(mean = mean(spross_dm), sd = sd(spross_dm))
 
-ms$treatment[ms$treatment == "5"] <- "WW2"
-ms$treatment[ms$treatment == "6"] <- "RS2"
+ms$treatment[ms$treatment == "5"] <- "Ch"
+ms$treatment[ms$treatment == "6"] <- "Fe"
 
 ms <- transform(ms, Year = as.factor(Year), 
                 treatment = as.factor(treatment))
@@ -216,7 +216,7 @@ ggplot(ms, aes(x = JDay, y = mean, colour = interaction(rainout.shelter, treatme
   geom_point() + geom_line() +
   facet_grid(cols = vars(Year)) +
   scale_colour_manual(values = c("brown4", "steelblue4", "brown2", "steelblue2"), name = "Treatment", 
-                      labels = c("WW2 Without", "RS2 Without", "WW2 With", "WW2 Without")) +
+                      labels = c("Ch Without", "Fe Without", "Ch With", "Fe Without")) +
   labs(x = "Day Number", y = "Mean dry matter [kg*" ~ha^-1 ~"]", title = "Dry Matter") +
   theme_bw() +
   theme(axis.text = element_text(size = 10), 
@@ -238,6 +238,13 @@ addline_format <- function(x,...){
   gsub("\\s","\n",x)
 }
 
+ms_max <- transform(ms_max, Year = as.character(Year))
+
+ms_max$Year[ms_max$Year == "2014"] <- "2014 - Spring Barley"
+ms_max$Year[ms_max$Year == "2015"] <- "2015 - Spring Oilseed Rape"
+ms_max$Year[ms_max$Year == "2016"] <- "2016 - Winter Barley"
+ms_max$Year[ms_max$Year == "2017"] <- "2017 - Oats"
+
 b <- ggplot(ms_max, aes(x = treatment, y = mean, fill = treatment)) +
   geom_bar(stat = "identity", position = position_dodge(), colour = "black") + 
   geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd), width=.2,
@@ -245,10 +252,9 @@ b <- ggplot(ms_max, aes(x = treatment, y = mean, fill = treatment)) +
   scale_fill_manual(values = c("brown4", "steelblue4", "brown2", "steelblue2")) +
   facet_grid(cols = vars(Year)) +
   scale_x_discrete(breaks = unique(ms_max$treatment),
-                   labels = addline_format(c("WW2 Without", "RS2 Without", "WW2 With", "RS2 With"))) +
+                   labels = addline_format(c("Ch Without", "Fe Without", "Ch With", "Fe With"))) +
   labs(x = "Treatment", 
-       y = bquote("Mean dry matter [kg*" ~ha^-1 ~"]"),
-       title = "Dry matter at the last Harvest") + 
+       y = bquote("Mean dry matter [kg*" ~ha^-1 ~"]")) + 
   theme_bw() +
   theme(axis.text = element_text(size = 10), 
         axis.title = element_text(size = 11), 

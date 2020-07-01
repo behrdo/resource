@@ -661,13 +661,17 @@ df$trtcomp[df$trtcomp == "1"] <- "Fe Rainfed" #fe=6
 df$trtcomp[df$trtcomp == "2"] <- "Ch Rainfed" #ch=5
 df$trtcomp[df$trtcomp == "3"] <- "Fe Rain Shelter" #fe=6
 df$trtcomp[df$trtcomp == "4"] <- "Ch Rain Shelter" #ch=5
+df$Year[df$Year == "2015"] <- "2015 - Spring Oilseed Rape"
+df$Year[df$Year == "2016"] <- "2016 - Winter Barley"
+df$Year[df$Year == "2017"] <- "2017 - Oats"
 
-df <- transform(df, depth = as.numeric(depth))
+df$depth_f = factor(df$depth, levels = c("15cm", "45cm", "75cm", "105cm", "135cm", 
+                                         "165cm", "195cm"))
 
 ggplot(df, aes(x = JDay, y = mean_VWC, color = trtcomp)) + 
   geom_line() +
-  facet_grid(cols = vars(Year), rows = vars(depth)) +
-  scale_colour_manual(values = c( "olivedrab2", "green3","orange2", "orange4"), 
+  facet_grid(cols = vars(Year), rows = vars(depth_f)) +
+  scale_colour_manual(values = c("brown4", "steelblue4", "brown2", "steelblue2"), 
                       name = "Treatment")+
   labs(x = "JDay", y = "Mean Volumetric Water Content [%]") +
   theme_bw() +
@@ -678,34 +682,12 @@ ggplot(df, aes(x = JDay, y = mean_VWC, color = trtcomp)) +
         strip.text.x = element_text(size = 10),
         legend.position="bottom")
 
-#stuff we probably wont need anymore ####
-#second one with daily data of all the years combined
-#1.1 as boxlots
-days_2013 <- read_excel("days_2013_calc korrig.xlsx")
-days_2014 <- read_excel("days_2014_calc korrig.xlsx")
-days_2015 <- read_excel("days_2015_calc korrig.xlsx")
-days_2016 <- read_excel("days_2016_calc korrig.xlsx")
-days_2017 <- read_excel("days_2017_calc korrig.xlsx")
-
-days_2017 <- slice(days_2017, 41:n())
-colnames(days_2017) = days_2017[1, ]
-days_2017 <- slice(days_2017, 2:n())
-
-days_2016 <- slice(days_2016, 41:n())
-colnames(days_2016) = days_2016[1, ]
-days_2016 <- slice(days_2016, 2:n())
-
-days_2015 <- slice(days_2015, 41:n())
-colnames(days_2015) = days_2015[1, ]
-days_2015 <- slice(days_2015, 2:n())
-
-days_2014 <- slice(days_2014, 41:n())
-colnames(days_2014) = days_2014[1, ]
-days_2014 <- slice(days_2014, 2:n())
-
-days_2013 <- slice(days_2013, 41:n())
-colnames(days_2013) = days_2013[1, ]
-days_2013 <- slice(days_2013, 2:n())
+#Monthly water balance ####
+days_2013 <- read_excel("days_2013_calc korrig.xlsx", skip = 41)
+days_2014 <- read_excel("days_2014_calc korrig.xlsx", skip = 41)
+days_2015 <- read_excel("days_2015_calc korrig.xlsx", skip = 41)
+days_2016 <- read_excel("days_2016_calc korrig.xlsx", skip = 41)
+days_2017 <- read_excel("days_2017_calc korrig.xlsx", skip = 41)
 
 names(days_2013)[20] <- "wasserbilanz"
 names(days_2014)[20] <- "wasserbilanz"
@@ -728,23 +710,55 @@ days_2016[3:22] <- NULL
 days_2017[2:19] <- NULL
 days_2017[3:22] <- NULL
 
-days_2013$jahr <- rep(2013, nrow(days_2013))
-days_2014$jahr <- rep(2014, nrow(days_2014))
-days_2015$jahr <- rep(2015, nrow(days_2015))
-days_2016$jahr <- rep(2016, nrow(days_2016))
-days_2017$jahr <- rep(2017, nrow(days_2017))
+days_2013 <- separate(days_2013, date, sep = "-", into =c("Year", "Month", "Day"))
+days_2014 <- separate(days_2014, date, sep = "-", into =c("Year", "Month", "Day"))
+days_2015 <- separate(days_2015, date, sep = "-", into =c("Year", "Month", "Day"))
+days_2016 <- separate(days_2016, date, sep = "-", into =c("Year", "Month", "Day"))
+days_2017 <- separate(days_2017, date, sep = "-", into =c("Year", "Month", "Day"))
 
-climate <- bind_rows(days_2013, days_2014, days_2015, days_2016, days_2017)
+days_2013$wasserbilanz <- as.numeric(days_2013$wasserbilanz)
+days_2014$wasserbilanz <- as.numeric(days_2014$wasserbilanz)
+days_2015$wasserbilanz <- as.numeric(days_2015$wasserbilanz)
+days_2016$wasserbilanz <- as.numeric(days_2016$wasserbilanz)
+days_2017$wasserbilanz <- as.numeric(days_2017$wasserbilanz)
 
-climate <- transform(climate, jahr = as.factor(jahr), 
-                   wasserbilanz = as.numeric(wasserbilanz))
+climate <- bind_rows(days_2014, days_2015, days_2016, days_2017)
 
-climate %>% mutate_at(vars(wasserbilanz), funs(round(., 2)))
+climate <- na.omit(climate)
 
-ggplot(climate, aes(x = jahr, y = wasserbilanz, fill = jahr)) +
-  geom_boxplot()
-#-> geringe varianz aber extrem viele ausreißer, macht keinen sinn so zu plotten
+ms <- climate %>% group_by(Year, Month) %>% summarise(sum_wasserbilanz = sum(wasserbilanz))
 
+ms <- mutate_at(ms, vars(sum_wasserbilanz), funs(round(., 2)))
+
+ms$Month[ms$Month == "01"] <- "Jan"
+ms$Month[ms$Month == "02"] <- "Feb"
+ms$Month[ms$Month == "03"] <- "Mar"
+ms$Month[ms$Month == "04"] <- "Apr"
+ms$Month[ms$Month == "05"] <- "May"
+ms$Month[ms$Month == "06"] <- "Jun"
+ms$Month[ms$Month == "07"] <- "Jul"
+ms$Month[ms$Month == "08"] <- "Aug"
+ms$Month[ms$Month == "09"] <- "Sep"
+ms$Month[ms$Month == "10"] <- "Okt"
+ms$Month[ms$Month == "11"] <- "Nov"
+ms$Month[ms$Month == "12"] <- "Dez"
+
+ggplot(ms, aes(x = Month, y = sum_wasserbilanz)) +
+  geom_col(fill = "#0072B2", color = "black") +
+  scale_fill_manual(values = c("#0072B2")) +
+  labs(x = "Months", y = bquote("Monthly Climatic Water Balance [mm]")) + 
+  facet_wrap(vars(Year)) +
+  scale_x_discrete(labels = c("Jan", "Feb", "Mar", "Apr", "May", 
+                            "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez")) +
+  theme_bw() +
+  theme(axis.text = element_text(size = 10), 
+        axis.title = element_text(size = 11), 
+        plot.title = element_text(size = 15, vjust = -10, hjust = 0.03), 
+        strip.text.y = element_text(size = 10), 
+        strip.text.x = element_text(size = 10), 
+        legend.position = c(0.8, 0.85))
+
+#stuff we probably wont need anymore ####
 #2.2 as a bar chart
 days_2013 <- days_2013[-c(39, 40, 41, 42), ]
 
