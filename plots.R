@@ -14,8 +14,8 @@ biopore[6] <- NULL
 
 biopore <- transform(biopore, treatment = as.character(treatment))
 
-names(biopore)[8] <- "2.5mm"
-names(biopore)[9] <- "5mm"
+names(biopore)[8] <- "2-5mm"
+names(biopore)[9] <- ">5mm"
 
 #creating a new dataframe with data that i can plot
 f <- filter(biopore, treatment == 5)
@@ -23,9 +23,9 @@ s <- filter(biopore, treatment == 6)
 
 df <- bind_rows(f, s)
 
-df <- select(df, "treatment", "2.5mm", "5mm")
+df <- select(df, "treatment", "2-5mm", ">5mm")
 
-df <- gather(df, "2.5mm", "5mm", key = "depth", value = "pores")
+df <- gather(df, "2-5mm", ">5mm", key = "depth", value = "pores")
 
 ms <- df %>% group_by(treatment, depth) %>% summarise(mean = mean(pores), sd = sd(pores))
 
@@ -33,12 +33,12 @@ ms$treatment[ms$treatment == "5"] <- "Ch"
 ms$treatment[ms$treatment == "6"] <- "Fe"
 
 #plotting
-a <- ggplot(ms, aes(x = depth, y = mean, fill = treatment)) +
+a <- ggplot(ms, aes(x = reorder(depth, -mean), y = mean, fill = treatment)) +
   geom_bar(stat = "identity", position = position_dodge(), colour = "black") + 
   geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd), width=.2,
                 position=position_dodge(.9)) +
   scale_fill_manual(values = c("red3", "#0072B2")) +
-  labs(fill = "Treatment",  x = "Depth", 
+  labs(fill = "Treatment",  x = "Pore Size", 
        y = bquote("Mean Biopores [" ~m^-2 ~ "]"),
        title = "A") + 
   theme_bw() +
