@@ -256,11 +256,12 @@ b <- ggplot(ms_max, aes(x = treatment, y = mean, fill = treatment)) +
   labs(x = "Treatment", 
        y = bquote("Mean dry matter [kg*" ~ha^-1 ~"]")) + 
   theme_bw() +
-  theme(axis.text = element_text(size = 10), 
-        axis.title = element_text(size = 11), 
+  theme(axis.text = element_text(size = 12), 
+        axis.title.y = element_text(size = 14),
+        axis.title.x = element_blank(), 
         plot.title = element_text(size = 15), 
-        strip.text.y = element_text(size = 10), 
-        strip.text.x = element_text(size = 10), 
+        strip.text.y = element_text(size = 13), 
+        strip.text.x = element_text(size = 13), 
         legend.position = "none")
 b
 

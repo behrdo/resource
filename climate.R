@@ -649,12 +649,14 @@ wasser17$Year <- rep(2017, nrow(wasser17))
 #plotting VWC ####
 df <- bind_rows(wasser, wasser16, wasser17)
 
+df <- mutate(df, VWC = VWC*100)
+
 df <- df %>% group_by(JDay, Year, trtcomp, depth) %>%
   summarise(Anzahl_Parzellen = length(VWC), 
             mean_VWC= mean(VWC, na.rm=TRUE), 
             sd_VWC = sd(VWC, na.rm=TRUE))
-#there are some values in 2017 that are very high! <- decided to exclude them for now
-df <- filter(df, mean_VWC < 1)
+#there are round about 400 values in 2017 that are >100%! <- decided to exclude them for now
+df <- filter(df, mean_VWC < 100)
 df <- na.omit(df)
 
 df$trtcomp[df$trtcomp == "1"] <- "Fe Rainfed" #fe=6
@@ -664,23 +666,34 @@ df$trtcomp[df$trtcomp == "4"] <- "Ch Rain Shelter" #ch=5
 df$Year[df$Year == "2015"] <- "2015 - Spring Oilseed Rape"
 df$Year[df$Year == "2016"] <- "2016 - Winter Barley"
 df$Year[df$Year == "2017"] <- "2017 - Oats"
+df$depth[df$depth == "15"] <- "15cm"
+df$depth[df$depth == "45"] <- "45cm"
+df$depth[df$depth == "75"] <- "75cm"
+df$depth[df$depth == "105"] <- "105cm"
+df$depth[df$depth == "135"] <- "135cm"
+df$depth[df$depth == "165"] <- "165cm"
+df$depth[df$depth == "195"] <- "195cm"
+
+df <- transform(df, depth = as.factor(depth))
 
 df$depth_f = factor(df$depth, levels = c("15cm", "45cm", "75cm", "105cm", "135cm", 
                                          "165cm", "195cm"))
 
-ggplot(df, aes(x = JDay, y = mean_VWC, color = trtcomp)) + 
+ggplot(df, aes(x = as.Date(JDay, origin = as.Date("2018-01-01")), y = mean_VWC, color = trtcomp)) + 
   geom_line() +
   facet_grid(cols = vars(Year), rows = vars(depth_f)) +
   scale_colour_manual(values = c("brown4", "steelblue4", "brown2", "steelblue2"), 
-                      name = "Treatment")+
-  labs(x = "JDay", y = "Mean Volumetric Water Content [%]") +
+                      name = "Treatment") +
+  scale_x_date(date_labels = "%b", ) +
+  labs(x = "Months", y = "Mean Volumetric Water Content [%]") +
   theme_bw() +
-  theme(axis.text = element_text(size = 10), 
-        axis.title = element_text(size = 11), 
+  theme(axis.text = element_text(size = 12), 
+        axis.title.y = element_text(size = 14),
+        axis.title.x = element_blank(), 
         plot.title = element_text(size = 15), 
-        strip.text.y = element_text(size = 10), 
-        strip.text.x = element_text(size = 10),
-        legend.position="bottom")
+        strip.text.y = element_text(size = 13), 
+        strip.text.x = element_text(size = 13),
+        legend.position = "bottom")
 
 #Monthly water balance ####
 days_2013 <- read_excel("days_2013_calc korrig.xlsx", skip = 41)
@@ -751,12 +764,12 @@ ggplot(ms, aes(x = Month, y = sum_wasserbilanz)) +
   scale_x_discrete(labels = c("Jan", "Feb", "Mar", "Apr", "May", 
                             "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez")) +
   theme_bw() +
-  theme(axis.text = element_text(size = 10), 
-        axis.title = element_text(size = 11), 
-        plot.title = element_text(size = 15, vjust = -10, hjust = 0.03), 
-        strip.text.y = element_text(size = 10), 
-        strip.text.x = element_text(size = 10), 
-        legend.position = c(0.8, 0.85))
+  theme(axis.text = element_text(size = 12), 
+        axis.title.y = element_text(size = 14),
+        axis.title.x = element_blank(), 
+        plot.title = element_text(size = 15), 
+        strip.text.y = element_text(size = 13), 
+        strip.text.x = element_text(size = 13))
 
 #stuff we probably wont need anymore ####
 #2.2 as a bar chart
