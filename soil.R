@@ -63,10 +63,10 @@ df <- cbind(df1, df2[!names(df2) %in% names(df1)])
 
 df <- transform(df, date = as.character(date))
 
-df$date[df$date == "1"] <- "Year 1"
-df$date[df$date == "2"] <- "Year 2"
-df$date[df$date == "3"] <- "Year 3"
-df$date[df$date == "4"] <- "Year 4"
+df$date[df$date == "1"] <- "2014"
+df$date[df$date == "2"] <- "2015"
+df$date[df$date == "3"] <- "2016"
+df$date[df$date == "4"] <- "2017"
 
 df$nutr[df$nutr == "mean_k"] <- "K"
 df$nutr[df$nutr == "mean_c"] <- "C"
@@ -99,24 +99,26 @@ w <- ggplot(df_k, aes(x = depth_class, y = mean_nutr, fill = treatment))+
                      limits=c(0,500))+
   coord_flip() +
   scale_color_manual(values = Farben_Varianten, aesthetics = "fill", labels=c("Ch", "Fe"))+
-  theme(axis.text.x = element_text(size = 10),
-        axis.ticks.x=element_line(size=0.5),
-        legend.title=element_blank(),
-        legend.position="bottom",
-        legend.text = element_text(size = 12),
-        legend.spacing.x = unit(0.2, 'cm'),
-        axis.title.x = element_text(size = 12),
-        axis.title.y = element_text(size = 12),
-        axis.text.y = element_text(size = 10),
+  theme(axis.text.x = element_text(size = 12),
+        axis.ticks.x = element_line(size=0.5),
+        legend.title = element_blank(),
+        legend.position = "bottom",
+        legend.text = element_text(size = 13),
+        legend.spacing.x = unit(0.2, "cm"),
+        axis.title.x = element_text(size = 14),
+        strip.text.y = element_text(size = 13), 
+        strip.text.x = element_text(size = 13),
+        axis.title.y = element_text(size = 14),
+        axis.text.y = element_text(size = 12),
         plot.title = element_text(size = 15, vjust = -115, hjust = 0.99))
 w
   
-x <- ggplot(df_c, aes(x = depth_class, y = mean_nutr, fill = treatment))+
-  geom_bar(stat="identity", position="dodge", color="black", size=0.1)+
-  ylab(bquote("Mean C [kg *" ~ha^-1 ~"]"))+
-  xlab("Soil Depth (cm)")+
+x <- ggplot(df_c, aes(x = depth_class, y = mean_nutr, fill = treatment)) +
+  geom_bar(stat="identity", position="dodge", color="black", size=0.1) +
+  ylab(bquote("Mean C [kg *" ~ha^-1 ~"]")) +
+  xlab("Soil Depth (cm)") +
   Thema_soil +
-  facet_grid(rows = vars(date))+
+  facet_grid(rows = vars(date)) +
   geom_errorbar(aes(ymin = mean_nutr-sd_nutr, ymax = mean_nutr+sd_nutr), 
                 position=position_dodge(width=0.9)) +  
   scale_x_reverse(breaks=c(1,2,3,4), labels=c("0-30", "30-45", "45-75", "75-105"))+
@@ -125,15 +127,17 @@ x <- ggplot(df_c, aes(x = depth_class, y = mean_nutr, fill = treatment))+
                      limits=c(0,1.6)) +
   coord_flip() +
   scale_color_manual(values = Farben_Varianten, aesthetics = "fill", labels=c("Ch", "Fe"))+
-  theme(axis.text.x = element_text(size = 10),
-        axis.ticks.x=element_line(size=0.5),
-        legend.title=element_blank(),
-        legend.position="bottom",
-        legend.text = element_text(size = 12),
-        legend.spacing.x = unit(0.2, 'cm'),
-        axis.title.x = element_text(size = 12),
-        axis.title.y = element_text(size = 12),
-        axis.text.y = element_text(size = 10),
+  theme(axis.text.x = element_text(size = 12),
+        axis.ticks.x = element_line(size=0.5),
+        legend.title = element_blank(),
+        legend.position = "bottom",
+        legend.text = element_text(size = 13),
+        legend.spacing.x = unit(0.2, "cm"),
+        axis.title.x = element_text(size = 14),
+        strip.text.y = element_text(size = 13), 
+        strip.text.x = element_text(size = 13),
+        axis.title.y = element_text(size = 14),
+        axis.text.y = element_text(size = 12),
         plot.title = element_text(size = 15, vjust = -115, hjust = 0.99))
 x
 
@@ -151,15 +155,17 @@ y <- ggplot(df_n, aes(x = depth_class, y = mean_nutr, fill = treatment))+
                      limits=c(0,0.15))+
   coord_flip() +
   scale_color_manual(values = Farben_Varianten, aesthetics = "fill", labels=c("Ch", "Fe"))+
-  theme(axis.text.x = element_text(size = 10),
-        axis.ticks.x=element_line(size=0.5),
-        legend.title=element_blank(),
-        legend.position="bottom",
-        legend.text = element_text(size = 12),
-        legend.spacing.x = unit(0.2, 'cm'),
-        axis.title.x = element_text(size = 12),
-        axis.title.y = element_text(size = 12),
-        axis.text.y = element_text(size = 10),
+  theme(axis.text.x = element_text(size = 12),
+        axis.ticks.x = element_line(size=0.5),
+        legend.title = element_blank(),
+        legend.position = "bottom",
+        legend.text = element_text(size = 13),
+        legend.spacing.x = unit(0.2, "cm"),
+        axis.title.x = element_text(size = 14),
+        strip.text.y = element_text(size = 13), 
+        strip.text.x = element_text(size = 13),
+        axis.title.y = element_text(size = 14),
+        axis.text.y = element_text(size = 12),
         plot.title = element_text(size = 15, vjust = -115, hjust = 0.99))
 y
 
@@ -177,15 +183,17 @@ z <- ggplot(df_p, aes(x = depth_class, y = mean_nutr, fill = treatment))+
                      limits=c(0,160))+
   coord_flip() +
   scale_color_manual(values = Farben_Varianten, aesthetics = "fill", labels=c("Ch", "Fe"))+
-  theme(axis.text.x = element_text(size = 10),
-        axis.ticks.x=element_line(size=0.5),
-        legend.title=element_blank(),
-        legend.position="bottom",
-        legend.text = element_text(size = 12),
-        legend.spacing.x = unit(0.2, 'cm'),
-        axis.title.x = element_text(size = 12),
-        axis.title.y = element_text(size = 12),
-        axis.text.y = element_text(size = 10),
+  theme(axis.text.x = element_text(size = 12),
+        axis.ticks.x = element_line(size=0.5),
+        legend.title = element_blank(),
+        legend.position = "bottom",
+        legend.text = element_text(size = 13),
+        legend.spacing.x = unit(0.2, "cm"),
+        axis.title.x = element_text(size = 14),
+        strip.text.y = element_text(size = 13), 
+        strip.text.x = element_text(size = 13),
+        axis.title.y = element_text(size = 14),
+        axis.text.y = element_text(size = 12),
         plot.title = element_text(size = 15, vjust = -115, hjust = 0.99))
 z
 

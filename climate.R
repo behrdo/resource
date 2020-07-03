@@ -684,7 +684,7 @@ ggplot(df, aes(x = as.Date(JDay, origin = as.Date("2018-01-01")), y = mean_VWC, 
   facet_grid(cols = vars(Year), rows = vars(depth_f)) +
   scale_colour_manual(values = c("brown4", "steelblue4", "brown2", "steelblue2"), 
                       name = "Treatment") +
-  scale_x_date(date_labels = "%b", ) +
+  scale_x_date(date_labels = "%b", date_breaks = "2 months") +
   labs(x = "Months", y = "Mean Volumetric Water Content [%]") +
   theme_bw() +
   theme(axis.text = element_text(size = 12), 
@@ -693,7 +693,9 @@ ggplot(df, aes(x = as.Date(JDay, origin = as.Date("2018-01-01")), y = mean_VWC, 
         plot.title = element_text(size = 15), 
         strip.text.y = element_text(size = 13), 
         strip.text.x = element_text(size = 13),
-        legend.position = "bottom")
+        legend.position = "bottom", 
+        legend.text = element_text(size = 13), 
+        legend.title = element_text(size = 13))
 
 #Monthly water balance ####
 days_2013 <- read_excel("days_2013_calc korrig.xlsx", skip = 41)

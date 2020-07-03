@@ -8,7 +8,7 @@ library(chillR)
 biopore <- read_excel("data_Trial_C_2020_05_12.xlsx", 
                       sheet = "biopores")
 
-#changing the dataframe into something i can work with :D
+#changing the dataframe into something i can work with
 biopore[12:21] <- NULL
 biopore[6] <- NULL
 
@@ -42,11 +42,13 @@ a <- ggplot(ms, aes(x = reorder(depth, -mean), y = mean, fill = treatment)) +
        y = bquote("Mean Biopores [" ~m^-2 ~ "]"),
        title = "A") + 
   theme_bw() +
-  theme(axis.text = element_text(size = 10), 
-        axis.title = element_text(size = 11), 
+  theme(axis.text = element_text(size = 12), 
+        axis.title = element_text(size = 14), 
         plot.title = element_text(size = 15, vjust = -10, hjust = 0.03), 
         strip.text.y = element_text(size = 10), 
-        strip.text.x = element_text(size = 10), 
+        strip.text.x = element_text(size = 10),
+        legend.text = element_text(size = 15), 
+        legend.title = element_text(size = 15), 
         legend.position = c(0.8, 0.80))
 a
 
@@ -74,8 +76,8 @@ b <- ggplot(ms1, aes(x = treatment, y = mean, fill = treatment)) +
        y = bquote("Mean dry matter [kg * " ~ha^-1 ~"]"),
        title = "B") + 
   theme_bw() +
-  theme(axis.text = element_text(size = 10), 
-        axis.title = element_text(size = 11), 
+  theme(axis.text = element_text(size = 12), 
+        axis.title = element_text(size = 14), 
         plot.title = element_text(size = 15, vjust = -10, hjust = 0.03), 
         strip.text.y = element_text(size = 10), 
         strip.text.x = element_text(size = 10), 
@@ -110,11 +112,12 @@ c <- ggplot(nutr, aes(x = treatm, y = mean_n, fill = treatm)) +
                 position=position_dodge(.9)) +
   scale_fill_manual(values = c("red3", "#0072B2")) +
   labs(x = "Treatment", 
-       y = bquote("Mean N uptake [g * " ~kg^-1 ~"DM]"),
+       y = bquote("Mean N accumulation [kg * " ~ha^-1 ~"]"),
        title = "C") + 
   theme_bw() +
-  theme(axis.text = element_text(size = 10), 
-        axis.title = element_text(size = 11), 
+  theme(axis.text = element_text(size = 12), 
+        axis.title = element_text(size = 14), 
+        axis.title.x = element_blank(),
         plot.title = element_text(size = 15, vjust = -10, hjust = 0.03), 
         strip.text.y = element_text(size = 10), 
         strip.text.x = element_text(size = 10), 
@@ -127,11 +130,12 @@ d <- ggplot(nutr, aes(x = treatm, y = mean_p, fill = treatm)) +
                 position=position_dodge(.9)) +
   scale_fill_manual(values = c("red3", "#0072B2")) +
   labs(x = "Treatment", 
-       y = bquote("Mean P uptake [g * " ~kg^-1 ~"DM]"),
+       y = bquote("Mean P accumulation [kg * " ~ha^-1 ~"]"),
        title = "D") + 
   theme_bw() +
-  theme(axis.text = element_text(size = 10), 
-        axis.title = element_text(size = 11), 
+  theme(axis.text = element_text(size = 12), 
+        axis.title = element_text(size = 14),
+        axis.title.x = element_blank(),
         plot.title = element_text(size = 15, vjust = -10, hjust = 0.03), 
         strip.text.y = element_text(size = 10), 
         strip.text.x = element_text(size = 10), 
@@ -144,11 +148,12 @@ e <- ggplot(nutr, aes(x = treatm, y = mean_k, fill = treatm)) +
                 position=position_dodge(.9)) +
   scale_fill_manual(values = c("red3", "#0072B2")) +
   labs(x = "Treatment", 
-       y = bquote("Mean K uptake [g * " ~kg^-1 ~"DM]"),
+       y = bquote("Mean K accumulation [kg * " ~ha^-1 ~"DM]"),
        title = "E") + 
   theme_bw() +
-  theme(axis.text = element_text(size = 10), 
-        axis.title = element_text(size = 11), 
+  theme(axis.text = element_text(size = 12), 
+        axis.title = element_text(size = 14), 
+        axis.title.x = element_blank(),
         plot.title = element_text(size = 15, vjust = -10, hjust = 0.03), 
         strip.text.y = element_text(size = 10), 
         strip.text.x = element_text(size = 10), 
@@ -156,7 +161,8 @@ e <- ggplot(nutr, aes(x = treatm, y = mean_k, fill = treatm)) +
 e
 
 cde <- ggarrange(c, d, e, nrow = 1)
-ggarrange(ab, cde, nrow = 2)
+cde
+#ggarrange(ab, cde, nrow = 2)
 
 #main crops - dry matter #### 
 #5, 7, 17, 19 sind treatment ww2
@@ -211,21 +217,20 @@ ms <- transform(ms, Year = as.factor(Year),
                 treatment = as.factor(treatment))
 
 #line und point plot mit den unterschiedlichen harvests
-ggplot(ms, aes(x = JDay, y = mean, colour = interaction(rainout.shelter, treatment),
-               group = interaction(treatment, rainout.shelter))) + 
-  geom_point() + geom_line() +
-  facet_grid(cols = vars(Year)) +
-  scale_colour_manual(values = c("brown4", "steelblue4", "brown2", "steelblue2"), name = "Treatment", 
-                      labels = c("Ch Without", "Fe Without", "Ch With", "Fe Without")) +
-  labs(x = "Day Number", y = "Mean dry matter [kg*" ~ha^-1 ~"]", title = "Dry Matter") +
-  theme_bw() +
-  theme(axis.text = element_text(size = 10), 
-        axis.title = element_text(size = 11), 
-        plot.title = element_text(size = 15), 
-        strip.text.y = element_text(size = 10), 
-        strip.text.x = element_text(size = 10)) + 
-  theme_bw()
-#error weil 2016 nur an einem date gemessen wurde -> mähsde nix
+#ggplot(ms, aes(x = JDay, y = mean, colour = interaction(rainout.shelter, treatment),
+#               group = interaction(treatment, rainout.shelter))) + 
+#  geom_point() + geom_line() +
+#  facet_grid(cols = vars(Year)) +
+#  scale_colour_manual(values = c("brown4", "steelblue4", "brown2", "steelblue2"), name = "Treatment", 
+#                      labels = c("Ch Without", "Fe Without", "Ch With", "Fe Without")) +
+#  labs(x = "Day Number", y = "Mean dry matter [kg*" ~ha^-1 ~"]", title = "Dry Matter") +
+#  theme_bw() +
+#  theme(axis.text = element_text(size = 10), 
+#        axis.title = element_text(size = 11), 
+#        plot.title = element_text(size = 15), 
+#        strip.text.y = element_text(size = 10), 
+#        strip.text.x = element_text(size = 10)) + 
+#  theme_bw()
 
 #DM barplot mit letztem harvest
 ms_max <- ms %>%
