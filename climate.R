@@ -661,8 +661,8 @@ df <- na.omit(df)
 
 df$trtcomp[df$trtcomp == "1"] <- "Fe Rainfed" #fe=6
 df$trtcomp[df$trtcomp == "2"] <- "Ch Rainfed" #ch=5
-df$trtcomp[df$trtcomp == "3"] <- "Fe Rain Shelter" #fe=6
-df$trtcomp[df$trtcomp == "4"] <- "Ch Rain Shelter" #ch=5
+df$trtcomp[df$trtcomp == "3"] <- "Fe Rainshelter" #fe=6
+df$trtcomp[df$trtcomp == "4"] <- "Ch Rainshelter" #ch=5
 df$Year[df$Year == "2015"] <- "2015 - Spring Oilseed Rape"
 df$Year[df$Year == "2016"] <- "2016 - Winter Barley"
 df$Year[df$Year == "2017"] <- "2017 - Oats"
@@ -679,10 +679,12 @@ df <- transform(df, depth = as.factor(depth))
 df$depth_f = factor(df$depth, levels = c("15cm", "45cm", "75cm", "105cm", "135cm", 
                                          "165cm", "195cm"))
 
-ggplot(df, aes(x = as.Date(JDay, origin = as.Date("2018-01-01")), y = mean_VWC, color = trtcomp)) + 
+ggplot(df, aes(x = as.Date(JDay, origin = as.Date("2018-01-01")), y = mean_VWC, color = trtcomp#, linetype = trtcomp
+               )) + 
   geom_line() +
   facet_grid(cols = vars(Year), rows = vars(depth_f)) +
-  scale_colour_manual(values = c("brown4", "steelblue4", "brown2", "steelblue2"), 
+#  scale_linetype_manual(values = c(rep("solid", 2), rep("dashed", 2)), legen) +
+  scale_colour_manual(values = c("red4", "steelblue4", "red1", "steelblue2"), 
                       name = "Treatment") +
   scale_x_date(date_labels = "%b", date_breaks = "2 months") +
   labs(x = "Months", y = "Mean Volumetric Water Content [%]") +

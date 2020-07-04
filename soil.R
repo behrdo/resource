@@ -83,7 +83,7 @@ df_n <- filter(df, nutr == "N")
 df_p <- filter(df, nutr == "P")
 
 #2. ploting 
-Farben_Varianten <- c("5" = "red3", "6" = "#0072B2")
+Farben_Varianten <- c("5" = "steelblue4", "6" = "steelblue1")
 
 w <- ggplot(df_k, aes(x = depth_class, y = mean_nutr, fill = treatment))+
   geom_bar(stat="identity", position="dodge", color="black", size=0.1)+

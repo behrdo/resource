@@ -4,6 +4,7 @@ library(gridExtra)
 library(ggpubr)
 library(lme4)
 library(chillR)
+
 #precrops - biopores ####
 biopore <- read_excel("data_Trial_C_2020_05_12.xlsx", 
                       sheet = "biopores")
@@ -37,7 +38,7 @@ a <- ggplot(ms, aes(x = reorder(depth, -mean), y = mean, fill = treatment)) +
   geom_bar(stat = "identity", position = position_dodge(), colour = "black") + 
   geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd), width=.2,
                 position=position_dodge(.9)) +
-  scale_fill_manual(values = c("red3", "#0072B2")) +
+  scale_fill_manual(values = c("steelblue4", "steelblue1")) +
   labs(fill = "Treatment",  x = "Pore Size", 
        y = bquote("Mean Biopores [" ~m^-2 ~ "]"),
        title = "A") + 
@@ -71,7 +72,7 @@ b <- ggplot(ms1, aes(x = treatment, y = mean, fill = treatment)) +
   geom_bar(stat = "identity", position = position_dodge(), colour = "black") + 
   geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd), width=.2,
                 position=position_dodge(.9)) +
-  scale_fill_manual(values = c("red3", "#0072B2")) +
+  scale_fill_manual(values = c("steelblue4", "steelblue1")) +
   labs(x = "Treatment", 
        y = bquote("Mean dry matter [kg * " ~ha^-1 ~"]"),
        title = "B") + 
@@ -110,7 +111,7 @@ c <- ggplot(nutr, aes(x = treatm, y = mean_n, fill = treatm)) +
   geom_bar(stat = "identity", position = position_dodge(), colour = "black") + 
   geom_errorbar(aes(ymin = mean_n-sd_n, ymax = mean_n+sd_n), width=.2,
                 position=position_dodge(.9)) +
-  scale_fill_manual(values = c("red3", "#0072B2")) +
+  scale_fill_manual(values = c("steelblue4", "steelblue1")) +
   labs(x = "Treatment", 
        y = bquote("Mean N accumulation [kg * " ~ha^-1 ~"]"),
        title = "C") + 
@@ -128,7 +129,7 @@ d <- ggplot(nutr, aes(x = treatm, y = mean_p, fill = treatm)) +
   geom_bar(stat = "identity", position = position_dodge(), colour = "black") + 
   geom_errorbar(aes(ymin = mean_p-sd_p, ymax = mean_p+sd_p), width=.2,
                 position=position_dodge(.9)) +
-  scale_fill_manual(values = c("red3", "#0072B2")) +
+  scale_fill_manual(values = c("steelblue4", "steelblue1")) +
   labs(x = "Treatment", 
        y = bquote("Mean P accumulation [kg * " ~ha^-1 ~"]"),
        title = "D") + 
@@ -146,9 +147,9 @@ e <- ggplot(nutr, aes(x = treatm, y = mean_k, fill = treatm)) +
   geom_bar(stat = "identity", position = position_dodge(), colour = "black") + 
   geom_errorbar(aes(ymin = mean_k-sd_k, ymax = mean_k+sd_k), width=.2,
                 position=position_dodge(.9)) +
-  scale_fill_manual(values = c("red3", "#0072B2")) +
+  scale_fill_manual(values = c("steelblue4", "steelblue1")) +
   labs(x = "Treatment", 
-       y = bquote("Mean K accumulation [kg * " ~ha^-1 ~"DM]"),
+       y = bquote("Mean K accumulation [kg * " ~ha^-1 ~"]"),
        title = "E") + 
   theme_bw() +
   theme(axis.text = element_text(size = 12), 
@@ -254,10 +255,11 @@ b <- ggplot(ms_max, aes(x = treatment, y = mean, fill = treatment)) +
   geom_bar(stat = "identity", position = position_dodge(), colour = "black") + 
   geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd), width=.2,
                 position=position_dodge(.9)) +
-  scale_fill_manual(values = c("brown4", "steelblue4", "brown2", "steelblue2")) +
+  scale_fill_manual(values = c("red4", "steelblue4", "red1", "steelblue1")) +
   facet_grid(cols = vars(Year)) +
   scale_x_discrete(breaks = unique(ms_max$treatment),
-                   labels = addline_format(c("Ch Without", "Fe Without", "Ch With", "Fe With"))) +
+                   labels = addline_format(c("Ch Rainfed", "Fe Rainfed", 
+                                             "Ch Rainshelter", "Fe Rainshelter"))) +
   labs(x = "Treatment", 
        y = bquote("Mean dry matter [kg*" ~ha^-1 ~"]")) + 
   theme_bw() +
