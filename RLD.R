@@ -5,7 +5,7 @@ library(gridExtra)
 library(ggpubr)
 library(lme4)
 library(chillR)
-RLD <- read_delim("RLD.csv", ";", escape_double = FALSE, 
+RLD <- read_delim("RLD4.csv", ";", escape_double = FALSE, 
                   col_types = cols(`sampling date` = col_date(format = "%d.%m.%Y"),
                                    `RLD total (cm cm-3)` = col_number(), 
                                    `RLD bulk (cm cm-3)` = col_number(), 
@@ -53,8 +53,22 @@ RLD <- transform(RLD, treatment = as.factor(treatment),
 RLD <- unite(RLD, Year, main.crop, col = Year, sep = "-")
 
 #Backup--------
-RLD1<- RLD
-RLD<- RLD1
+RLD0<- RLD
+RLD<-RLD0
+
+#JDay Solution-----------------------
+# make data
+value <- rnorm(365, mean = 0, sd = 5)
+jday <- 1:365 # represents your Julian days 1-365; assumes no leap years
+
+# make data frame and add julian day
+d <- data.frame(jday = jday, value = value, stringsAsFactors = FALSE)
+head(d)
+
+# plot with date labels on x axis    
+ggplot(d, aes(x = as.Date(jday, origin = as.Date("2018-01-01")), y = value)) +
+  geom_line() +
+  scale_x_date(date_labels = "%b")
 
 #Total Rootlegth (m m-2) Troughout the Year----------------------------------------
 #summarize RLD of 5cm x m^2 to get total rootlength per m^2
@@ -63,14 +77,16 @@ RL_tot <- RLD %>% group_by(JDay, Year, treatment, rainout.shelter) %>%
   summarise(tot_m2=sum(tot_m2), blk_m2=sum(blk_m2), BP_m2=sum(BP_m2))
 
 #plot
-ggplot(RL_tot, aes(x = JDay, y = blk_m2, colour = interaction(rainout.shelter, treatment),
+ggplot(RL_tot, aes(x = as.Date(JDay, origin = as.Date("2013-01-01")), y = blk_m2, 
+                colour = interaction(rainout.shelter, treatment),
                group = interaction(treatment, rainout.shelter))) + 
   geom_point() + geom_line() +
   facet_grid(cols = vars(Year)) +
   scale_colour_manual(values = c("brown4", "steelblue4", "brown2", "steelblue2"), name = "Treatment",
                       labels = c("Ch rain shelter", "Ch rainfed", "Fe rain shelter", "Fe rainfed"))+
-  labs(x = "Day Number", y = "Rootlength [m  " ~m^2 ~"]", title = "Total Rootlegth Troughout the Year") +
+  labs(x = "", y = "Rootlength [m  " ~m^2 ~"]", title = "Total Rootlegth Troughout the Year") +
   theme_bw() +
+  scale_x_date(date_labels = "%b")+
   theme(axis.text = element_text(size = 10), 
         axis.title = element_text(size = 11), 
         plot.title = element_text(size = 15), 
@@ -145,41 +161,54 @@ RLDP$percentage <- as.numeric(RLDP$percentage)
       theme_bw()
 
 
-# for different depth <30 / >30 at last sampling date--------------------------------------------------
+# for different depth <30 / >30 throughout the year--------------------------------------------------
 
-  u30 <- filter(RLD, depth <=30)
-  o30 <- filter(RLD, depth >=30)
-  frames = c(u30, o30)
-  RL30 <- pd.concat (frames, keys =c("<30",">30") )
+t30 <- filter(RLD, depth <=30)
+s30 <- filter(RLD, depth >30)
   
-  u30 <- filter(RLD, depth <=30)
-  o30 <- filter(RLD, depth >=30)
-  # add colomn that distinguishes <30 / >30
-  
-  u30 <- u30 %>% group_by(JDay, Year, treatment, rainout.shelter) %>% 
+RL_t <- t30 %>% group_by(JDay, Year, treatment, rainout.shelter) %>% 
+  summarise(tot_m2=sum(tot_m2), blk_m2=sum(blk_m2), BP_m2=sum(BP_m2))
+RL_s <- s30 %>% group_by(JDay, Year, treatment, rainout.shelter) %>% 
     summarise(tot_m2=sum(tot_m2), blk_m2=sum(blk_m2), BP_m2=sum(BP_m2))
-  o30 <- o30 %>% group_by(JDay, Year, treatment, rainout.shelter) %>% 
-    summarise(tot_m2=sum(tot_m2), blk_m2=sum(blk_m2), BP_m2=sum(BP_m2))
+
   
-  
-  RL30 <- gather(RL30, "blk_m2", "BP_m2", key = "pore_kind", value = "m2")
-  
-  ggplot(RL30, aes(x = depth, y = m2, colour = interaction(rainout.shelter, treatment),
+ggplot(RL_t, aes(x = as.Date(JDay, origin = as.Date("2013-01-01")), y = blk_m2, colour = interaction(rainout.shelter, treatment),
                    group = interaction(treatment, rainout.shelter))) + 
-    geom_point() + geom_line() +
-    facet_grid(cols = vars(Year)) +
-    scale_colour_manual(values = c("brown4", "steelblue4", "brown2", "steelblue2"), name = "Treatment")+
-    #labels = c("RS2 rain shelter", "RS2 rainfed", "WW2 rain shelter", "WW2 rainfed")) +
-    #labs(x = "Day Number", y = "Rootlength [m  " ~m^2 ~"]", title = "Total Rootlegnth") +
-    theme_bw() +
-    scale_x_reverse(breaks=c(1,2,3,4))+
-    coord_flip()+
-    theme(axis.text = element_text(size = 10), 
-          axis.title = element_text(size = 11), 
-          plot.title = element_text(size = 15), 
-          strip.text.y = element_text(size = 10), 
-          strip.text.x = element_text(size = 10)) + 
-    theme_bw()
+  geom_point() + geom_line() +
+  facet_grid(cols = vars(Year)) +
+  scale_colour_manual(values = c("brown4", "steelblue4", "brown2", "steelblue2"), name = "Treatment",
+                      labels = c("Ch rain shelter", "Ch rainfed", "Fe rain shelter", "Fe rainfed"))+
+  labs(x="", y = "Rootlength [m  " ~m^2 ~"]", title = "Total Rootlegth of the Topsoil Troughout the Year") +
+  theme_bw() +
+  scale_x_date(date_labels = "%b")+
+  theme(axis.text = element_text(size = 10), 
+        axis.title = element_text(size = 11), 
+        plot.title = element_text(size = 15), 
+        strip.text.y = element_text(size = 10), 
+        strip.text.x = element_text(size = 10))+ 
+  theme_bw()
+
+
+ggplot(RL_s, aes(x = as.Date(JDay, origin = as.Date("2013-01-01")), y = blk_m2, colour = interaction(rainout.shelter, treatment),
+                 group = interaction(treatment, rainout.shelter))) + 
+  geom_point() + geom_line() +
+  facet_grid(cols = vars(Year)) +
+  scale_colour_manual(values = c("brown4", "steelblue4", "brown2", "steelblue2"), name = "Treatment",
+                      labels = c("Ch rain shelter", "Ch rainfed", "Fe rain shelter", "Fe rainfed"))+
+  labs(x = "", y = "Rootlength [m  " ~m^2 ~"]", title = "Total Rootlegth in Subsoil Troughout the Year") +
+  theme_bw() +
+  scale_x_date(date_labels = "%b")+
+  theme(axis.text = element_text(size = 10), 
+        axis.title = element_text(size = 11), 
+        plot.title = element_text(size = 15), 
+        strip.text.y = element_text(size = 10), 
+        strip.text.x = element_text(size = 10))+ 
+  theme_bw()
+
+
+
+
+
   
   
   
