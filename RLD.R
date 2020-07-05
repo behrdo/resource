@@ -118,7 +118,6 @@ RLD2 <- RLD2 %>% group_by(pore_kind, crop, Year, treatment, rainout.shelter, dep
 ggplot(RLD2, aes(x = depth, y = cm3, colour = interaction(rainout.shelter, pore_kind),
                  group = interaction(pore_kind, rainout.shelter))) + 
    geom_line() +
-  #facet_grid(cols = vars(crop), rows = vars(treatment)) +
   facet_grid(treatment ~ Year + crop) +
   scale_colour_manual(values = c( "olivedrab2", "green3","orange2", "orange4"), 
                       name = "Treatment",labels = c("BP Rain Shelter", "BP Rainfed",
@@ -153,25 +152,21 @@ ggplot(RLDP, aes(x = depth, y = percentage, colour = interaction(rainout.shelter
   facet_grid(cols= vars(Year , crop)) +
   scale_colour_manual(values = c("brown4", "steelblue4", "brown2", "steelblue2"), name = "Treatment",
   labels = c("Ch rain shelter", "Ch rainfed", "Fe rain shelter", "Fe rainfed"))+
-  labs(x = "Soildepth", y = "Used BP of total Rootlength [%]"
- #, title = "Relative Biopore Use"
-  ) +
+  labs(x = "Soildepth [cm]", y = "Used BP of total Rootlength [%]") +
   scale_x_reverse()+
   coord_flip()+
   scale_y_continuous(breaks=c(0,50,100))+
+  theme_bw()+
   theme(axis.text = element_text(size = 12), 
-         axis.title.y = element_text(size = 14),
-         axis.title.x = element_text(size = 14),
-         plot.title = element_text(size = 15), 
-         strip.text.y = element_text(size = 13), 
-         strip.text.x = element_text(size = 13),
-         legend.position = "bottom") +
-  theme_bw()
+        axis.title.y = element_text(size = 14),
+        axis.title.x = element_text(size = 13),
+        plot.title = element_text(size = 15), 
+        strip.text.y = element_text(size = 13), 
+        strip.text.x = element_text(size = 13),
+        legend.position = "bottom")
 
 
-# for different depth <30 / >30 throughout the year--------------------------------------------------
-
-
+# Total Rootlegth for different depth <30 / >30 throughout the year---------------------------------------------------
 t30 <- filter(RLD, depth <=30)
 s30 <- filter(RLD, depth >30)
   
@@ -191,38 +186,18 @@ ggplot(RL_t_s, aes(x = as.Date(JDay, origin = as.Date("2013-01-01")), y = blk_m2
   facet_grid(depth ~ Year + crop)  +
   scale_colour_manual(values = c("brown4", "steelblue4", "brown2", "steelblue2"), name = "Treatment",
                       labels = c("Ch rain shelter", "Ch rainfed", "Fe rain shelter", "Fe rainfed"))+
-  labs(x="", y = "Rootlength [m  " ~m^2 ~"]", 
-       #title = "Total Rootlegth of the Topsoil Troughout the Year"
-       ) +
-  theme_bw() +
+  labs(x="", y = "Rootlength [m  " ~m^2 ~"]") +
   scale_x_date(date_labels = "%b")+
+  theme_bw()+
   theme(axis.text = element_text(size = 12), 
         axis.title.y = element_text(size = 14),
         axis.title.x = element_text(size = 14),
         plot.title = element_text(size = 15), 
         strip.text.y = element_text(size = 13), 
         strip.text.x = element_text(size = 13),
-        legend.position = "bottom") + 
-  theme_bw()
-
-
-ggplot(RL_s, aes(x = as.Date(JDay, origin = as.Date("2013-01-01")), y = blk_m2, colour = interaction(rainout.shelter, treatment),
-                 group = interaction(treatment, rainout.shelter))) + 
-  geom_point() + geom_line() +
-  facet_grid(cols = vars(Year)) +
-  scale_colour_manual(values = c("brown4", "steelblue4", "brown2", "steelblue2"), name = "Treatment",
-                      labels = c("Ch rain shelter", "Ch rainfed", "Fe rain shelter", "Fe rainfed"))+
-  labs(x = "", y = "Rootlength [m  " ~m^2 ~"]", title = "Total Rootlegth in Subsoil Troughout the Year") +
-  theme_bw() +
-  scale_x_date(date_labels = "%b")+
-  theme(axis.text = element_text(size = 10), 
-        axis.title = element_text(size = 11), 
-        plot.title = element_text(size = 15), 
-        strip.text.y = element_text(size = 10), 
-        strip.text.x = element_text(size = 10))+ 
-  theme_bw()
-
-
+        legend.position = "bottom",
+        legend.text = element_text(size = 12),
+        legend.title=element_text(size=14))
 
 
 
