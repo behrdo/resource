@@ -4,7 +4,7 @@ library(gridExtra)
 library(ggpubr)
 library(lme4)
 library(chillR)
-# precrop dry matter----------------------
+#precrop dry matter----------------------
 Rohdaten_shoot <- read.csv2("precrop data C.csv")
 
 ms1 <- Rohdaten_shoot %>% group_by(treatment) %>% summarise(mean = mean(DM_mean), sd = sd(DM_mean))
@@ -94,6 +94,7 @@ spross <- transform(spross, Year = as.factor(Year),
 spross$treatment[spross$treatment == "5"] <- "Fe"
 spross$treatment[spross$treatment == "6"] <- "Ch"
 
+spross <- spross[-c(103, 104), ] 
 
 ms_sp<- drop_na(spross, spross_dm)
 ms_sp <- spross %>% group_by(Year, treatment, rainout.shelter, JDay) %>% 
@@ -102,7 +103,8 @@ ms_sp <- spross %>% group_by(Year, treatment, rainout.shelter, JDay) %>%
 ms_h <- drop_na(spross, harvest_dm)
 ms_h <- spross %>% group_by(Year, treatment, rainout.shelter, JDay) %>% 
   summarise(mean_h =mean(harvest_dm), sd_h = sd(harvest_dm))
-            
+
+           
 ms_st <- drop_na(spross, straw_dm)
 ms_st <- spross %>% group_by(Year, treatment, rainout.shelter, JDay) %>% 
               summarise( mean_st=mean(straw_dm), sd_st = sd(straw_dm)) 
@@ -218,7 +220,7 @@ ggplot(ms_max, aes(x = treatment, y = mean_st, fill = treatment)) +
                    labels = addline_format(c("Ch Rainfed", "Fe Rainfed", 
                                              "Ch Rainshelter", "Fe Rainshelter"))) +
   labs(x = "Treatment", 
-       y = bquote("Mean Straw Harvest Dry Matter [kg*" ~ha^-1 ~"]")) + 
+       y = bquote("Mean Straw Harvest Dry Matter [kg * " ~ha^-1 ~"]")) + 
   theme_bw() +
   theme(axis.text = element_text(size = 12), 
         axis.title.y = element_text(size = 14),

@@ -32,12 +32,17 @@ RLD[2] <- NULL
 RLD[5] <- NULL
 RLD[4] <- NULL
 names(RLD)[1]  <- "sampling.date"
+names(RLD)[5]  <- "crop"
 
 Fe2 <- filter(RLD, treatment == "5")
 Ch2 <- filter(RLD, treatment == "6")
 RLD <- bind_rows(Fe2, Ch2)
 RLD$treatment[RLD$treatment == "5"]<- "Fe"
 RLD$treatment[RLD$treatment == "6"]<- "Ch"
+RLD$crop[RLD$crop == "winter oilseed rape"]<- "S. Oilseed Rape"
+RLD$crop[RLD$crop == "spring barley"]<- "Spring Barley"
+RLD$crop[RLD$crop == "oats"]<- "Oats"
+
 
 RLD <- RLD[complete.cases(RLD[ , 7:8]),]
 RLD$rainout.shelter[is.na(RLD$rainout.shelter)] = "rainfed"
@@ -50,25 +55,22 @@ RLD[2:3] <- NULL
 RLD <- transform(RLD, treatment = as.factor(treatment),
                  plot = as.factor(plot),
                  rainout.shelter = as.factor(rainout.shelter))
-RLD <- unite(RLD, Year, main.crop, col = Year, sep = "-")
+#RLD <- unite(RLD, Year, main.crop, col = Year, sep = "-")
 
 #Backup--------
 RLD0<- RLD
 RLD<-RLD0
 
 #JDay Solution-----------------------
-# make data
+  # make data
 value <- rnorm(365, mean = 0, sd = 5)
 jday <- 1:365 # represents your Julian days 1-365; assumes no leap years
 
-# make data frame and add julian day
+  # make data frame and add julian day
 d <- data.frame(jday = jday, value = value, stringsAsFactors = FALSE)
 head(d)
 
-# plot with date labels on x axis    
-ggplot(d, aes(x = as.Date(jday, origin = as.Date("2018-01-01")), y = value)) +
-  geom_line() +
-  scale_x_date(date_labels = "%b")
+
 
 #Total Rootlegth (m m-2) Troughout the Year----------------------------------------
 #summarize RLD of 5cm x m^2 to get total rootlength per m^2
@@ -109,83 +111,98 @@ ggplot(RL_tot_max, aes(x = treatment, y = m2, fill = pore_kind)) +
 
 #for single values of harvesting date------------------------------------------------
 RLD2 <- gather(RLD,  "tot_cm3","BP_cm3", key = "pore_kind", value = "cm3")
-RLD2 <- RLD2 %>%group_by(pore_kind,Year, treatment, rainout.shelter, depth) %>%filter(JDay == max(JDay))
-RLD2 <- RLD2 %>% group_by(pore_kind, Year, treatment, rainout.shelter, depth) %>% 
+RLD2 <- RLD2 %>%group_by(pore_kind,crop, Year, treatment, rainout.shelter, depth) %>%filter(JDay == max(JDay))
+RLD2 <- RLD2 %>% group_by(pore_kind, crop, Year, treatment, rainout.shelter, depth) %>% 
   summarise(cm3=mean(cm3))
 
 ggplot(RLD2, aes(x = depth, y = cm3, colour = interaction(rainout.shelter, pore_kind),
                  group = interaction(pore_kind, rainout.shelter))) + 
    geom_line() +
-  facet_grid(cols = vars(Year), rows = vars(treatment)) +
+  #facet_grid(cols = vars(crop), rows = vars(treatment)) +
+  facet_grid(treatment ~ Year + crop) +
   scale_colour_manual(values = c( "olivedrab2", "green3","orange2", "orange4"), 
                       name = "Treatment",labels = c("BP Rain Shelter", "BP Rainfed",
                                                     "Total Rain Shelter", "Total Rainfed"))+
-  labs(x = bquote("Soil Depth [cm]"), y= "Rootlength Density [m *" ~cm^-3 ~"]" , title = "Rootlegnth Density at Harvesting Date") +
+  labs(x = bquote("Soil Depth [cm]"), y= "Rootlength Density [m *" ~cm^-3 ~"]") +
   theme_bw() +
   scale_x_reverse()+
   coord_flip()+
-  theme(axis.text = element_text(size = 10), 
-        axis.title = element_text(size = 11), 
+  theme(axis.text = element_text(size = 12), 
+        axis.title.y = element_text(size = 14),
+        axis.title.x = element_text(size = 14),
         plot.title = element_text(size = 15), 
-        strip.text.y = element_text(size = 10), 
-        strip.text.x = element_text(size = 10),
-        legend.position="bottom") + 
+        strip.text.y = element_text(size = 13), 
+        strip.text.x = element_text(size = 13),
+        legend.position = "bottom") 
+        
   theme_bw()
 #daten von 2015??
 
 
 # percentages of BP use from total root emergance--------------------------------------------
-RLDP <- RLD %>%group_by(Year, treatment, rainout.shelter, depth) %>%filter(JDay == max(JDay))
-RLDP <- RLDP %>% group_by(Year, treatment, rainout.shelter, depth) %>% 
+RLDP <- RLD %>%group_by(Year, crop, treatment, rainout.shelter, depth) %>%filter(JDay == max(JDay))
+RLDP <- RLDP %>% group_by(Year, crop, treatment, rainout.shelter, depth) %>% 
   summarise(tot_m2=mean(tot_m2), BP_m2=mean(BP_m2))
 RLDP <- mutate (RLDP, percentage= BP_m2/tot_m2*100 )
 RLDP$percentage[is.na(RLDP$percentage)] = "0"
 RLDP$percentage <- as.numeric(RLDP$percentage)
 
- ggplot(RLDP, aes(x = depth, y = percentage, colour = interaction(rainout.shelter, treatment),
+ggplot(RLDP, aes(x = depth, y = percentage, colour = interaction(rainout.shelter, treatment),
                    group = interaction(rainout.shelter, treatment))) + 
-    geom_line() +
-      facet_grid(cols = vars(Year)) +
-    scale_colour_manual(values = c("brown4", "steelblue4", "brown2", "steelblue2"), name = "Treatment",
-   labels = c("Ch rain shelter", "Ch rainfed", "Fe rain shelter", "Fe rainfed"))+
-    labs(x = "Soildepth", y = "Used BP of total Rootlength [%]", title = "Relative Biopore Use") +
-      theme_bw() +
-      scale_x_reverse()+
-      coord_flip()+
-   scale_y_continuous(breaks=c(0,50,100))+
-    theme(axis.text = element_text(size = 10), 
-            axis.title = element_text(size = 11), 
-            plot.title = element_text(size = 15), 
-            strip.text.y = element_text(size = 10), 
-            strip.text.x = element_text(size = 10)) + 
-      theme_bw()
+                  geom_line() +
+  facet_grid(cols= vars(Year , crop)) +
+  scale_colour_manual(values = c("brown4", "steelblue4", "brown2", "steelblue2"), name = "Treatment",
+  labels = c("Ch rain shelter", "Ch rainfed", "Fe rain shelter", "Fe rainfed"))+
+  labs(x = "Soildepth", y = "Used BP of total Rootlength [%]"
+ #, title = "Relative Biopore Use"
+  ) +
+  scale_x_reverse()+
+  coord_flip()+
+  scale_y_continuous(breaks=c(0,50,100))+
+  theme(axis.text = element_text(size = 12), 
+         axis.title.y = element_text(size = 14),
+         axis.title.x = element_text(size = 14),
+         plot.title = element_text(size = 15), 
+         strip.text.y = element_text(size = 13), 
+         strip.text.x = element_text(size = 13),
+         legend.position = "bottom") +
+  theme_bw()
 
 
 # for different depth <30 / >30 throughout the year--------------------------------------------------
 
+
 t30 <- filter(RLD, depth <=30)
 s30 <- filter(RLD, depth >30)
   
-RL_t <- t30 %>% group_by(JDay, Year, treatment, rainout.shelter) %>% 
+RL_t <- t30 %>% group_by(JDay, Year, crop, treatment, rainout.shelter) %>% 
   summarise(tot_m2=sum(tot_m2), blk_m2=sum(blk_m2), BP_m2=sum(BP_m2))
-RL_s <- s30 %>% group_by(JDay, Year, treatment, rainout.shelter) %>% 
+RL_s <- s30 %>% group_by(JDay, Year, crop, treatment, rainout.shelter) %>% 
     summarise(tot_m2=sum(tot_m2), blk_m2=sum(blk_m2), BP_m2=sum(BP_m2))
 
+RL_t$depth <- rep("<30cm Soildepth", nrow(RL_t))
+RL_s$depth <- rep(">30cm Soildepth", nrow(RL_s))
+RL_t_s<- bind_rows(RL_t, RL_s)
+
   
-ggplot(RL_t, aes(x = as.Date(JDay, origin = as.Date("2013-01-01")), y = blk_m2, colour = interaction(rainout.shelter, treatment),
+ggplot(RL_t_s, aes(x = as.Date(JDay, origin = as.Date("2013-01-01")), y = blk_m2, colour = interaction(rainout.shelter, treatment),
                    group = interaction(treatment, rainout.shelter))) + 
   geom_point() + geom_line() +
-  facet_grid(cols = vars(Year)) +
+  facet_grid(depth ~ Year + crop)  +
   scale_colour_manual(values = c("brown4", "steelblue4", "brown2", "steelblue2"), name = "Treatment",
                       labels = c("Ch rain shelter", "Ch rainfed", "Fe rain shelter", "Fe rainfed"))+
-  labs(x="", y = "Rootlength [m  " ~m^2 ~"]", title = "Total Rootlegth of the Topsoil Troughout the Year") +
+  labs(x="", y = "Rootlength [m  " ~m^2 ~"]", 
+       #title = "Total Rootlegth of the Topsoil Troughout the Year"
+       ) +
   theme_bw() +
   scale_x_date(date_labels = "%b")+
-  theme(axis.text = element_text(size = 10), 
-        axis.title = element_text(size = 11), 
+  theme(axis.text = element_text(size = 12), 
+        axis.title.y = element_text(size = 14),
+        axis.title.x = element_text(size = 14),
         plot.title = element_text(size = 15), 
-        strip.text.y = element_text(size = 10), 
-        strip.text.x = element_text(size = 10))+ 
+        strip.text.y = element_text(size = 13), 
+        strip.text.x = element_text(size = 13),
+        legend.position = "bottom") + 
   theme_bw()
 
 
@@ -209,7 +226,7 @@ ggplot(RL_s, aes(x = as.Date(JDay, origin = as.Date("2013-01-01")), y = blk_m2, 
 
 
 
-  
+
   
   
   
