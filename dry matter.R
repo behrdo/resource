@@ -143,19 +143,20 @@ ms_max$Year[ms_max$Year == "2017"] <- "2017 - Oats"
 
 ms_max <- unite(ms_max, treatment, rainout.shelter, col = treatment, sep = "-")
 
+names(ms_max)[2] <- "Treatment"
+
 addline_format <- function(x,...){
   gsub("\\s","\n",x)
 }
 
-b <- ggplot(ms_max, aes(x = treatment, y = mean_h, fill = treatment)) +
+b <- ggplot(ms_max, aes(x = Treatment, y = mean_h, fill = Treatment)) +
   geom_bar(stat = "identity", position = position_dodge(), colour = "black") + 
   geom_errorbar(aes(ymin = mean_h-sd_h, ymax = mean_h+sd_h), width=.2,
                 position=position_dodge(.9)) +
-  scale_fill_manual(values = c("red4", "steelblue4", "red1", "steelblue1")) +
+  scale_fill_manual(values = c("red4", "steelblue4", "red1", "steelblue1"), 
+                    labels = c("Ch Rainshelter", "Ch Rainfed", 
+                                              "Fe Rainshelter", "Fe Rainfed")) +
   facet_grid(cols = vars(Year)) +
-  scale_x_discrete(breaks = unique(ms_max$treatment),
-                   labels = addline_format(c("Ch Rainfed", "Fe Rainfed", 
-                                             "Ch Rainshelter", "Fe Rainshelter"))) +
   labs(x = "Treatment", 
        y = bquote("Mean Grain Harvest [kg*" ~ha^-1 ~"]")) + 
   theme_bw() +
@@ -164,8 +165,9 @@ b <- ggplot(ms_max, aes(x = treatment, y = mean_h, fill = treatment)) +
         axis.title.x = element_blank(), 
         plot.title = element_text(size = 15), 
         strip.text.y = element_text(size = 13), 
-        strip.text.x = element_text(size = 13), 
-        legend.position = "none")
+        strip.text.x = element_text(size = 13),
+        axis.text.x = element_blank(),
+        legend.position = c(0.12, 0.85))
 b
 
 #barplot mit letztem harvest raps---------?h/st/sp?---------
@@ -210,15 +212,16 @@ addline_format <- function(x,...){
   gsub("\\s","\n",x)
 }
 
-ggplot(ms_max, aes(x = treatment, y = mean_st, fill = treatment)) +
+names(ms_max)[2] <- "Treatment"
+
+ggplot(ms_max, aes(x = Treatment, y = mean_st, fill = Treatment)) +
   geom_bar(stat = "identity", position = position_dodge(), colour = "black") + 
   geom_errorbar(aes(ymin = mean_st-sd_st, ymax = mean_st+sd_st), width=.2,
                 position=position_dodge(.9)) +
-  scale_fill_manual(values = c("red4", "steelblue4", "red1", "steelblue1")) +
+  scale_fill_manual(values = c("red4", "steelblue4", "red1", "steelblue1"), 
+                    labels = c("Ch Rainshelter", "Ch Rainfed", 
+                               "Fe Rainshelter", "Fe Rainfed")) +
   facet_grid(cols = vars(Year)) +
-  scale_x_discrete(breaks = unique(ms_max$treatment),
-                   labels = addline_format(c("Ch Rainfed", "Fe Rainfed", 
-                                             "Ch Rainshelter", "Fe Rainshelter"))) +
   labs(x = "Treatment", 
        y = bquote("Mean Straw Harvest Dry Matter [kg * " ~ha^-1 ~"]")) + 
   theme_bw() +
@@ -227,8 +230,9 @@ ggplot(ms_max, aes(x = treatment, y = mean_st, fill = treatment)) +
         axis.title.x = element_blank(), 
         plot.title = element_text(size = 15), 
         strip.text.y = element_text(size = 13), 
-        strip.text.x = element_text(size = 13), 
-        legend.position = "none")
+        strip.text.x = element_text(size = 13),
+        axis.text.x = element_blank(),
+        legend.position = c(0.12, 0.85))
 
 
 
