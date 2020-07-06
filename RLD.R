@@ -34,11 +34,11 @@ RLD[4] <- NULL
 names(RLD)[1]  <- "sampling.date"
 names(RLD)[5]  <- "crop"
 
-Fe2 <- filter(RLD, treatment == "5")
-Ch2 <- filter(RLD, treatment == "6")
+Fe2 <- filter(RLD, treatment == "6")
+Ch2 <- filter(RLD, treatment == "5")
 RLD <- bind_rows(Fe2, Ch2)
-RLD$treatment[RLD$treatment == "5"]<- "Fe"
-RLD$treatment[RLD$treatment == "6"]<- "Ch"
+RLD$treatment[RLD$treatment == "6"]<- "Fe"
+RLD$treatment[RLD$treatment == "5"]<- "Ch"
 RLD$crop[RLD$crop == "winter oilseed rape"]<- "S. Oilseed Rape"
 RLD$crop[RLD$crop == "spring barley"]<- "Spring Barley"
 RLD$crop[RLD$crop == "oats"]<- "Oats"
@@ -135,7 +135,6 @@ ggplot(RLD2, aes(x = depth, y = cm3, colour = interaction(rainout.shelter, pore_
         legend.position = "bottom") 
         
   theme_bw()
-#daten von 2015??
 
 
 # percentages of BP use from total root emergance--------------------------------------------
@@ -185,7 +184,8 @@ ggplot(RL_t_s, aes(x = as.Date(JDay, origin = as.Date("2013-01-01")), y = blk_m2
   geom_point() + geom_line() +
   facet_grid(depth ~ Year + crop)  +
   scale_colour_manual(values = c("brown4", "steelblue4", "brown2", "steelblue2"), name = "Treatment",
-                      labels = c("Ch rain shelter", "Ch rainfed", "Fe rain shelter", "Fe rainfed"))+
+                      labels = c("Ch rain shelter", "Ch rainfed", "Fe rain shelter", "Fe rainfed")
+                      )+
   labs(x="", y = "Rootlength [m  " ~m^2 ~"]") +
   scale_x_date(date_labels = "%b")+
   theme_bw()+
