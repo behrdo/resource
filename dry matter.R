@@ -154,8 +154,8 @@ b <- ggplot(ms_max, aes(x = Treatment, y = mean_h, fill = Treatment)) +
   geom_errorbar(aes(ymin = mean_h-sd_h, ymax = mean_h+sd_h), width=.2,
                 position=position_dodge(.9)) +
   scale_fill_manual(values = c("red4", "steelblue4", "red1", "steelblue1"), 
-                    labels = c("Ch Rainfed", "Fe Rainfed", 
-                                              "Ch Rainshelter", "Fe Rainshelter")) +
+                    labels = c("Ch Rainshelter", "Ch Rainfed", 
+                                              "Fe Rainshelter", "Fe Rainfed")) +
   facet_grid(cols = vars(Year)) +
   labs(x = "Treatment", 
        y = bquote("Mean Grain Harvest [kg*" ~ha^-1 ~"]")) + 
@@ -212,13 +212,15 @@ addline_format <- function(x,...){
   gsub("\\s","\n",x)
 }
 
-ggplot(ms_max, aes(x = treatment, y = mean_st, fill = treatment)) +
+names(ms_max)[2] <- "Treatment"
+
+ggplot(ms_max, aes(x = Treatment, y = mean_st, fill = Treatment)) +
   geom_bar(stat = "identity", position = position_dodge(), colour = "black") + 
   geom_errorbar(aes(ymin = mean_st-sd_st, ymax = mean_st+sd_st), width=.2,
                 position=position_dodge(.9)) +
   scale_fill_manual(values = c("red4", "steelblue4", "red1", "steelblue1"), 
-                    labels = c("Ch Rainfed", "Fe Rainfed", 
-                               "Ch Rainshelter", "Fe Rainshelter")) +
+                    labels = c("Ch Rainshelter", "Ch Rainfed", 
+                               "Fe Rainshelter", "Fe Rainfed")) +
   facet_grid(cols = vars(Year)) +
   labs(x = "Treatment", 
        y = bquote("Mean Straw Harvest Dry Matter [kg * " ~ha^-1 ~"]")) + 
