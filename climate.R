@@ -739,6 +739,7 @@ days_2015$wasserbilanz <- as.numeric(days_2015$wasserbilanz)
 days_2016$wasserbilanz <- as.numeric(days_2016$wasserbilanz)
 days_2017$wasserbilanz <- as.numeric(days_2017$wasserbilanz)
 
+#climate <- bind_rows(days_2013, days_2014, days_2015, days_2016, days_2017)
 climate <- bind_rows(days_2014, days_2015, days_2016, days_2017)
 
 climate <- na.omit(climate)
@@ -765,6 +766,7 @@ ggplot(ms, aes(x = Month, y = sum_wasserbilanz)) +
   scale_fill_manual(values = c("#0072B2")) +
   labs(x = "Months", y = bquote("Monthly Climatic Water Balance [mm]")) + 
   facet_wrap(vars(Year)) +
+  #geom_text(aes(label=sum_wasserbilanz), vjust= -0.6, color = "black", size=3.5) +
   scale_x_discrete(labels = c("Jan", "Feb", "Mar", "Apr", "May", 
                             "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez")) +
   theme_bw() +
