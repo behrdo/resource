@@ -79,10 +79,10 @@ spross <- spross %>% mutate_at(vars(harvest_dm), funs(round(., 1)))
 spross <- spross %>% mutate_at(vars(straw_dm), funs(round(., 1)))
 
 
-f <- filter(spross, treatment == "5")
-s <- filter(spross, treatment == "6")
+c <- filter(spross, treatment == "5")
+f <- filter(spross, treatment == "6")
 
-spross <- bind_rows(f, s)
+spross <- bind_rows(c, f)
 
 
 spross <- transform(spross, rainout.shelter = as.character(rainout.shelter))
@@ -91,8 +91,8 @@ spross$rainout.shelter[is.na(spross$rainout.shelter)] = "without"
 spross <- transform(spross, Year = as.factor(Year), 
                 treatment = as.character(treatment))
 
-spross$treatment[spross$treatment == "5"] <- "Fe"
-spross$treatment[spross$treatment == "6"] <- "Ch"
+spross$treatment[spross$treatment == "5"] <- "Ch"
+spross$treatment[spross$treatment == "6"] <- "Fe"
 
 spross <- spross[-c(103, 104), ] 
 
@@ -149,13 +149,16 @@ addline_format <- function(x,...){
   gsub("\\s","\n",x)
 }
 
+
+
 b <- ggplot(ms_max, aes(x = Treatment, y = mean_h, fill = Treatment)) +
   geom_bar(stat = "identity", position = position_dodge(), colour = "black") + 
   geom_errorbar(aes(ymin = mean_h-sd_h, ymax = mean_h+sd_h), width=.2,
                 position=position_dodge(.9)) +
-  scale_fill_manual(values = c("red4", "steelblue4", "red1", "steelblue1"), 
-                    labels = c("Ch Rainshelter", "Ch Rainfed", 
-                                              "Fe Rainshelter", "Fe Rainfed")) +
+  scale_x_discrete(limits = c("Ch-with", "Fe-with","Ch-without", "Fe-without"))+
+  scale_fill_manual(values = c("red4", "steelblue4", "red1", "steelblue1") 
+                   ,labels = c("Ch Rainshelter", "Ch Rainfed", "Fe Rainshelter", "Fe Rainfed")
+                  ) +
   facet_grid(cols = vars(Year)) +
   labs(x = "Treatment", 
        y = bquote("Mean Grain Harvest [kg*" ~ha^-1 ~"]")) + 
@@ -218,9 +221,10 @@ ggplot(ms_max, aes(x = Treatment, y = mean_st, fill = Treatment)) +
   geom_bar(stat = "identity", position = position_dodge(), colour = "black") + 
   geom_errorbar(aes(ymin = mean_st-sd_st, ymax = mean_st+sd_st), width=.2,
                 position=position_dodge(.9)) +
-  scale_fill_manual(values = c("red4", "steelblue4", "red1", "steelblue1"), 
-                    labels = c("Ch Rainshelter", "Ch Rainfed", 
-                               "Fe Rainshelter", "Fe Rainfed")) +
+  scale_x_discrete(limits = c("Ch-with", "Fe-with","Ch-without", "Fe-without"))+
+  scale_fill_manual(values = c("red4", "steelblue4", "red1", "steelblue1")
+                    #,labels = c("Ch Rainshelter", "Ch Rainfed", "Fe Rainshelter", "Fe Rainfed")
+                    ) +
   facet_grid(cols = vars(Year)) +
   labs(x = "Treatment", 
        y = bquote("Mean Straw Harvest Dry Matter [kg * " ~ha^-1 ~"]")) + 
