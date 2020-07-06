@@ -109,29 +109,8 @@ ms_st <- drop_na(spross, straw_dm)
 ms_st <- spross %>% group_by(Year, treatment, rainout.shelter, JDay) %>% 
               summarise( mean_st=mean(straw_dm), sd_st = sd(straw_dm)) 
 
-
-#line und point plot mit den unterschiedlichen harvests-----erstmal raus wg h sp unterschiede raps usw------
-ms1<- filter(ms, Year != "2015")
-
-ggplot(ms1, aes(x = JDay, y = mean_sp, colour = interaction(rainout.shelter, treatment),
-               group = interaction(treatment, rainout.shelter))) + 
-  geom_point() + geom_line() +
-  facet_grid(cols = vars(Year)) +
-  scale_colour_manual(values = c("brown4", "steelblue4", "brown2", "steelblue2"), 
-                      name = "Treatment")+ 
-                      labels = c("Ch Rain Shelter", "Ch Rainfed", "Fe Rain Shelter", "Fe Rainfed")) +
-  labs(x = "", y = "Mean Grain Harvest [kg  " ~ha^-1 ~"]", title = "Dry Matter") +
-  theme_bw() +
-  theme(axis.text = element_text(size = 10), 
-        axis.title = element_text(size = 11), 
-        plot.title = element_text(size = 15), 
-        strip.text.y = element_text(size = 10), 
-        strip.text.x = element_text(size = 10)) + 
-  theme_bw()
-#error weil 2016 nur an einem date gemessen wurde -> mähsde nix
-
-#DM barplot mit grain harvest-------
-ms1 <- ms_h %>%
+#barplot mit spross ---------
+ms1 <- ms_sp %>%
   group_by(Year) %>%
   filter(JDay == max(JDay))
 ms_max<- filter(ms1, Year != "2015")
@@ -143,60 +122,50 @@ ms_max$Year[ms_max$Year == "2017"] <- "2017 - Oats"
 
 ms_max <- unite(ms_max, treatment, rainout.shelter, col = treatment, sep = "-")
 
-names(ms_max)[2] <- "Treatment"
-
 addline_format <- function(x,...){
   gsub("\\s","\n",x)
 }
 
+names(ms_max)[2] <- "Treatment"
 
-
-b <- ggplot(ms_max, aes(x = Treatment, y = mean_h, fill = Treatment)) +
-  geom_bar(stat = "identity", position = position_dodge(), colour = "black") + 
-  geom_errorbar(aes(ymin = mean_h-sd_h, ymax = mean_h+sd_h), width=.2,
-                position=position_dodge(.9)) +
-  scale_x_discrete(limits = c("Ch-with", "Fe-with","Ch-without", "Fe-without"))+
-  scale_fill_manual(values = c("red4", "steelblue4", "red1", "steelblue1") 
-                   ,labels = c("Ch Rainshelter", "Ch Rainfed", "Fe Rainshelter", "Fe Rainfed")
-                  ) +
-  facet_grid(cols = vars(Year)) +
-  labs(x = "Treatment", 
-       y = bquote("Mean Grain Harvest [kg*" ~ha^-1 ~"]")) + 
-  theme_bw() +
-  theme(axis.text = element_text(size = 12), 
-        axis.title.y = element_text(size = 14),
-        axis.title.x = element_blank(), 
-        plot.title = element_text(size = 15), 
-        strip.text.y = element_text(size = 13), 
-        strip.text.x = element_text(size = 13),
-        axis.text.x = element_blank(),
-        legend.position = c(0.12, 0.85))
-b
-
-#barplot mit letztem harvest raps---------?h/st/sp?---------
-
-ms2<- filter(ms1, Year == "2015")
-ms2 <- unite(ms2, treatment, rainout.shelter, col = treatment, sep = "-")
-
-ggplot(ms2, aes(x = treatment, y = mean_sp, fill = treatment)) +
+ggplot(ms_max, aes(x = Treatment, y = mean_sp, fill = Treatment)) +
   geom_bar(stat = "identity", position = position_dodge(), colour = "black") + 
   geom_errorbar(aes(ymin = mean_sp-sd_sp, ymax = mean_sp+sd_sp), width=.2,
                 position=position_dodge(.9)) +
-  scale_fill_manual(values = c("red4", "steelblue4", "red1", "steelblue1")) +
-  #facet_grid(cols = vars(Year)) +
-  scale_x_discrete(breaks = unique(ms2$treatment),
-             #falsch     # labels = addline_format(c("Ch Rainfed", "Fe Rainfed", 
- #                                            "Ch Rainshelter", "Fe Rainshelter"))) +
-  labs(x = "Treatment", 
-       y = bquote("Mean Shoot Dry Matter [kg*" ~ha^-1 ~"]")) + 
+  scale_x_discrete(limits = c("Ch-with", "Fe-with","Ch-without", "Fe-without"))+
+  scale_fill_manual(values = c("red4", "steelblue4", "red1", "steelblue1"),
+                    labels = c("Ch Rainshelter", "Ch Rainfed", "Fe Rainshelter", "Fe Rainfed") +
+                      facet_grid(cols = vars(Year)) +
+                      labs(x = "Treatment", 
+                           y = bquote("Mean Shoot Dry Matter [kg * " ~ha^-1 ~"]")) + 
   theme_bw() +
   theme(axis.text = element_text(size = 12), 
-        axis.title.y = element_text(size = 14),
-        axis.title.x = element_blank(), 
+                            axis.title.y = element_text(size = 14),
+                            axis.title.x = element_blank(), 
+                            plot.title = element_text(size = 15), 
+                            strip.text.y = element_text(size = 13), 
+                            strip.text.x = element_text(size = 13),
+                            axis.text.x = element_blank(),
+                            legend.position = c(0.12, 0.85))
+                    
+#line und point plot mit den unterschiedlichen harvests-----erstmal raus wg h sp unterschiede raps usw------
+ms1<- filter(ms, Year != "2015")
+
+ggplot(ms1, aes(x = JDay, y = mean_sp, colour = interaction(rainout.shelter, treatment),
+               group = interaction(treatment, rainout.shelter))) + 
+  geom_point() + geom_line() +
+  facet_grid(cols = vars(Year)) +
+  scale_colour_manual(values = c("brown4", "steelblue4", "brown2", "steelblue2"), name = "Treatment", 
+                      labels = c("Ch Rain Shelter", "Ch Rainfed", "Fe Rain Shelter", "Fe Rainfed")) +
+  labs(x = "", y = "Mean Grain Harvest [kg  " ~ha^-1 ~"]", title = "Dry Matter") +
+  theme_bw() +
+  theme(axis.text = element_text(size = 10), 
+        axis.title = element_text(size = 11), 
         plot.title = element_text(size = 15), 
-        strip.text.y = element_text(size = 13), 
-        strip.text.x = element_text(size = 13), 
-        legend.position = "none")
+        strip.text.y = element_text(size = 10), 
+        strip.text.x = element_text(size = 10)) + 
+  theme_bw()
+#error weil 2016 nur an einem date gemessen wurde -> mähsde nix
 
 #barplot mit straw ---------
 ms1 <- ms_st %>%
@@ -240,3 +209,47 @@ ggplot(ms_max, aes(x = Treatment, y = mean_st, fill = Treatment)) +
 
 
 
+
+
+#barplot mit grain harvest-------
+ms1 <- ms_h %>%
+  group_by(Year) %>%
+  filter(JDay == max(JDay))
+ms_max<- filter(ms1, Year != "2015")
+ms_max$Year <- as.character(ms_max$Year)
+
+ms_max$Year[ms_max$Year == "2014"] <- "2014 - Spring Barley"
+ms_max$Year[ms_max$Year == "2016"] <- "2016 - Winter Barley"
+ms_max$Year[ms_max$Year == "2017"] <- "2017 - Oats"
+
+ms_max <- unite(ms_max, treatment, rainout.shelter, col = treatment, sep = "-")
+
+names(ms_max)[2] <- "Treatment"
+
+addline_format <- function(x,...){
+  gsub("\\s","\n",x)
+}
+
+
+
+b <- ggplot(ms_max, aes(x = Treatment, y = mean_h, fill = Treatment)) +
+  geom_bar(stat = "identity", position = position_dodge(), colour = "black") + 
+  geom_errorbar(aes(ymin = mean_h-sd_h, ymax = mean_h+sd_h), width=.2,
+                position=position_dodge(.9)) +
+  scale_x_discrete(limits = c("Ch-with", "Fe-with","Ch-without", "Fe-without"))+
+  scale_fill_manual(values = c("red4", "steelblue4", "red1", "steelblue1") 
+                    ,labels = c("Ch Rainshelter", "Ch Rainfed", "Fe Rainshelter", "Fe Rainfed")
+  ) +
+  facet_grid(cols = vars(Year)) +
+  labs(x = "Treatment", 
+       y = bquote("Mean Grain Harvest [kg*" ~ha^-1 ~"]")) + 
+  theme_bw() +
+  theme(axis.text = element_text(size = 12), 
+        axis.title.y = element_text(size = 14),
+        axis.title.x = element_blank(), 
+        plot.title = element_text(size = 15), 
+        strip.text.y = element_text(size = 13), 
+        strip.text.x = element_text(size = 13),
+        axis.text.x = element_blank(),
+        legend.position = c(0.12, 0.85))
+b
