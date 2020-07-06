@@ -739,13 +739,14 @@ days_2015$wasserbilanz <- as.numeric(days_2015$wasserbilanz)
 days_2016$wasserbilanz <- as.numeric(days_2016$wasserbilanz)
 days_2017$wasserbilanz <- as.numeric(days_2017$wasserbilanz)
 
-#climate <- bind_rows(days_2013, days_2014, days_2015, days_2016, days_2017)
-climate <- bind_rows(days_2014, days_2015, days_2016, days_2017)
+climate <- bind_rows(days_2013, days_2014, days_2015, days_2016, days_2017)
+#climate <- bind_rows(days_2014, days_2015, days_2016, days_2017)
 
 climate <- na.omit(climate)
 
 ms <- climate %>% group_by(Year, Month) %>% summarise(sum_wasserbilanz = sum(wasserbilanz))
-
+#ms <- climate %>% group_by(Year) %>% summarise(sum_wasserbilanz = sum(wasserbilanz))
+#ms <- climate %>% summarise(sum_wasserbilanz = sum(wasserbilanz))
 ms <- mutate_at(ms, vars(sum_wasserbilanz), funs(round(., 2)))
 
 ms$Month[ms$Month == "01"] <- "Jan"
