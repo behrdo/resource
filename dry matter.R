@@ -62,7 +62,7 @@ names(spross)[9] <- "date"
 names(spross)[10] <- "spross_dm"
 names(spross)[19] <- "harvest_dm"
 names(spross)[28] <- "straw_dm"
-
+ 
 spross[20:27] <- NULL
 spross[21:31] <-NULL
 spross <- separate(spross, date, sep = "-", into =c("Year", "Month", "Day"))
@@ -75,7 +75,6 @@ spross <- transform(spross, straw_dm = as.numeric(straw_dm))
 
 
 spross <- spross %>% mutate_at(vars(spross_dm), funs(round(., 1)))
-
 spross <- spross %>% mutate_at(vars(harvest_dm), funs(round(., 1)))
 spross <- spross %>% mutate_at(vars(straw_dm), funs(round(., 1)))
 
@@ -98,24 +97,28 @@ spross$treatment[spross$treatment == "6"] <- "Fe"
 spross <- spross[-c(103, 104), ] 
 
 ms_sp<- drop_na(spross, spross_dm)
+ms_sp <- spross %>% group_by(Year, treatment, rainout.shelter, JDay, plot, field.rep) %>% 
+  summarise(mean_sp = mean(spross_dm), sd_sp = sd(spross_dm))
 ms_sp <- spross %>% group_by(Year, treatment, rainout.shelter, JDay) %>% 
   summarise(mean_sp = mean(spross_dm), sd_sp = sd(spross_dm))
 
 ms_h <- drop_na(spross, harvest_dm)
+ms_h <- spross %>% group_by(Year, treatment, rainout.shelter, JDay, plot, field.rep) %>% 
+  summarise(mean_h = mean(harvest_dm), sd_h = sd(harvest_dm))
 ms_h <- spross %>% group_by(Year, treatment, rainout.shelter, JDay) %>% 
   summarise(mean_h =mean(harvest_dm), sd_h = sd(harvest_dm))
 
            
 ms_st <- drop_na(spross, straw_dm)
+ms_st <- spross %>% group_by(Year, treatment, rainout.shelter, JDay, plot, field.rep) %>% 
+  summarise( mean_st=mean(straw_dm), sd_st = sd(straw_dm))
 ms_st <- spross %>% group_by(Year, treatment, rainout.shelter, JDay) %>% 
-              summarise( mean_st=mean(straw_dm), sd_st = sd(straw_dm)) 
+              summarise( mean_st=mean(straw_dm), sd_st = sd(straw_dm))
+
 
 #barplot mit spross ---------
-ms1 <- ms_sp %>%
-  group_by(Year) %>%
-  filter(JDay == max(JDay))
-ms_max<- filter(ms1, Year != "2015")
-ms_max$Year <- as.character(ms_max$Year)
+ms_max <- ms_sp %>%group_by(Year) %>%filter(JDay == max(JDay))
+ms_max$Year <- ms_max$Year <- as.character(ms1$Year)
 
 ms_max$Year[ms_max$Year == "2014"] <- "2014 - Spring Barley"
 ms_max$Year[ms_max$Year == "2016"] <- "2016 - Winter Barley"
@@ -128,26 +131,25 @@ addline_format <- function(x,...){
 }
 
 names(ms_max)[2] <- "Treatment"
-
 ggplot(ms_max, aes(x = Treatment, y = mean_sp, fill = Treatment)) +
   geom_bar(stat = "identity", position = position_dodge(), colour = "black") + 
   geom_errorbar(aes(ymin = mean_sp-sd_sp, ymax = mean_sp+sd_sp), width=.2,
                 position=position_dodge(.9)) +
   scale_x_discrete(limits = c("Ch-with", "Fe-with","Ch-without", "Fe-without"))+
-  scale_fill_manual(values = c("red4", "steelblue4", "red1", "steelblue1"),
-                    labels = c("Ch Rainshelter", "Ch Rainfed", "Fe Rainshelter", "Fe Rainfed") +
-                      facet_grid(cols = vars(Year)) +
-                      labs(x = "Treatment", 
-                           y = bquote("Mean Shoot Dry Matter [kg * " ~ha^-1 ~"]")) + 
+  scale_fill_manual(values = c("red4", "steelblue4", "red1", "steelblue1")
+                    ,labels = c("Ch Rainshelter", "Ch Rainfed", "Fe Rainshelter", "Fe Rainfed")) +
+  facet_grid(cols = vars(Year)) +
+  labs(x = "Treatment", 
+       y = bquote("Mean Dry Matter [kg * " ~ha^-1 ~"]")) + 
   theme_bw() +
   theme(axis.text = element_text(size = 12), 
-                            axis.title.y = element_text(size = 14),
-                            axis.title.x = element_blank(), 
-                            plot.title = element_text(size = 15), 
-                            strip.text.y = element_text(size = 13), 
-                            strip.text.x = element_text(size = 13),
-                            axis.text.x = element_blank(),
-                            legend.position = c(0.12, 0.85))
+        axis.title.y = element_text(size = 14),
+        axis.title.x = element_blank(), 
+        plot.title = element_text(size = 15), 
+        strip.text.y = element_text(size = 13), 
+        strip.text.x = element_text(size = 13),
+        axis.text.x = element_blank(),
+        legend.position = c(0.12, 0.85))
                     
 #line und point plot mit den unterschiedlichen harvests-----erstmal raus wg h sp unterschiede raps usw------
 ms1<- filter(ms, Year != "2015")
@@ -169,9 +171,7 @@ ggplot(ms1, aes(x = JDay, y = mean_sp, colour = interaction(rainout.shelter, tre
 #error weil 2016 nur an einem date gemessen wurde -> mähsde nix
 
 #barplot mit straw ---------
-ms1 <- ms_st %>%
-  group_by(Year) %>%
-  filter(JDay == max(JDay))
+ms1 <- ms_st %>%group_by(Year) %>%filter(JDay == max(JDay))
 ms_max<- filter(ms1, Year != "2015")
 ms_max$Year <- as.character(ms_max$Year)
 
