@@ -75,7 +75,6 @@ spross <- transform(spross, straw_dm = as.numeric(straw_dm))
 
 
 spross <- spross %>% mutate_at(vars(spross_dm), funs(round(., 1)))
-
 spross <- spross %>% mutate_at(vars(harvest_dm), funs(round(., 1)))
 spross <- spross %>% mutate_at(vars(straw_dm), funs(round(., 1)))
 

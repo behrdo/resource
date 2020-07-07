@@ -55,8 +55,6 @@ RLD[2:3] <- NULL
 RLD <- transform(RLD, treatment = as.factor(treatment),
                  plot = as.factor(plot),
                  rainout.shelter = as.factor(rainout.shelter))
-#RLD <- unite(RLD, Year, main.crop, col = Year, sep = "-")
-
 #Backup--------
 RLD0<- RLD
 RLD<-RLD0
@@ -73,7 +71,7 @@ head(d)
 
 
 #Total Rootlegth (m m-2) Troughout the Year----------------------------------------
-#summarize RLD of 5cm x m^2 to get total rootlength per m^2
+  #summarize RLD of 5cm x m^2 to get total rootlength per m^2
 
 RL_tot <- RLD %>% group_by(JDay, Year, treatment, rainout.shelter) %>% 
   summarise(tot_m2=sum(tot_m2), blk_m2=sum(blk_m2), BP_m2=sum(BP_m2))
@@ -96,7 +94,6 @@ ggplot(RL_tot, aes(x = as.Date(JDay, origin = as.Date("2013-01-01")), y = blk_m2
         strip.text.x = element_text(size = 10))+ 
   theme_bw()
 # Data for 2016 is missing and some for 2017 too?
-#something wrong with 2015 data?
 
 #for max values comparing blk and BP for all years and all depth-----not nice jet--------------------------
 RL_tot_max <- RL_tot %>%group_by(Year, treatment, rainout.shelter) %>%filter(JDay == max(JDay))
