@@ -251,6 +251,11 @@ ms_max$Year[ms_max$Year == "2015"] <- "2015 - Spring Oilseed Rape"
 ms_max$Year[ms_max$Year == "2016"] <- "2016 - Winter Barley"
 ms_max$Year[ms_max$Year == "2017"] <- "2017 - Oats"
 
+ms_max$treatment[ms_max$treatment == "Ch-without"] <- "1"
+ms_max$treatment[ms_max$treatment == "Fe-without"] <- "2"
+ms_max$treatment[ms_max$treatment == "Ch-with"] <- "3"
+ms_max$treatment[ms_max$treatment == "Fe-with"] <- "4"
+
 b <- ggplot(ms_max, aes(x = treatment, y = mean, fill = treatment)) +
   geom_bar(stat = "identity", position = position_dodge(), colour = "black") + 
   geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd), width=.2,
@@ -258,8 +263,8 @@ b <- ggplot(ms_max, aes(x = treatment, y = mean, fill = treatment)) +
   scale_fill_manual(values = c("red4", "steelblue4", "red1", "steelblue1")) +
   facet_grid(cols = vars(Year)) +
   scale_x_discrete(breaks = unique(ms_max$treatment),
-                   labels = addline_format(c("Ch Rainfed", "Fe Rainfed", 
-                                             "Ch Rainshelter", "Fe Rainshelter"))) +
+                   labels = addline_format(c("Ch Without", "Fe Without", 
+                                             "Ch With", "Fe With"))) +
   labs(x = "Treatment", 
        y = bquote("Mean dry matter [kg*" ~ha^-1 ~"]")) + 
   theme_bw() +
@@ -271,6 +276,149 @@ b <- ggplot(ms_max, aes(x = treatment, y = mean, fill = treatment)) +
         strip.text.x = element_text(size = 13), 
         legend.position = "none")
 b
+#miriams results: ch with rainshelter more yield, Fe without
+#in oilseed rape my graphic shows the same, 
+#now lets see how this looks for winter barley and oats
+spross <- read_excel("data Trial C_2020_06_10_naemi.xlsx", 
+                     sheet = "PlantNutrients Bearbeitet", 
+                     col_types = c("text", "text", "text", 
+                                   "text", "text", "text", "text", "text", 
+                                   "date", "text", "text", "text", "text", 
+                                   "text", "text", "text", "text", "text", 
+                                   "text", "text", "text", "text", "text", 
+                                   "text", "text", "text", "text", "text", 
+                                   "text", "text", "text", "text", "text", 
+                                   "text", "text", "text", "numeric", 
+                                   "text", "text"))
+
+
+#1. data frame vorbereiten
+spross <- slice(spross, 1:360)
+
+names(spross)[9] <- "date"
+names(spross)[10] <- "spross_dm"
+names(spross)[19] <- "grain_dm"
+
+spross[20:39] <- NULL
+
+spross <- separate(spross, date, sep = "-", into =c("Year", "Month", "Day"))
+
+spross <- make_JDay(spross)
+
+spross <- transform(spross, spross_dm = as.numeric(spross_dm), 
+                    grain_dm = as.numeric(grain_dm))
+
+#spross <- spross %>% mutate_at(vars(spross_dm), funs(round(., 1)))
+
+f <- filter(spross, treatment == "5")
+s <- filter(spross, treatment == "6")
+
+spross <- bind_rows(f, s)
+
+spross$rainout.shelter[is.na(spross$rainout.shelter)] = "without"
+
+spross <- drop_na(spross, grain_dm)
+
+#first mean of plots and then overall mean???
+ms <- spross %>% group_by(Year, treatment, rainout.shelter, JDay, plot) %>% 
+  summarise(mean1 = mean(grain_dm), sd1 = sd(grain_dm))
+
+ms <- ms %>% group_by(Year, treatment, rainout.shelter, JDay) %>% 
+  summarise(mean = mean(mean1), sd = sd(mean1))
+
+ms$treatment[ms$treatment == "5"] <- "Ch"
+ms$treatment[ms$treatment == "6"] <- "Fe"
+
+ms$Year[ms$Year == "2014"] <- "2014 - Spring Barley"
+ms$Year[ms$Year == "2015"] <- "2015 - Spring Oilseed Rape"
+ms$Year[ms$Year == "2016"] <- "2016 - Winter Barley"
+ms$Year[ms$Year == "2017"] <- "2017 - Oats"
+
+ms <- unite(ms, treatment, rainout.shelter, col = treatment, sep = "-")
+
+ms$treatment[ms$treatment == "Ch-without"] <- "1"
+ms$treatment[ms$treatment == "Fe-without"] <- "2"
+ms$treatment[ms$treatment == "Ch-with"] <- "3"
+ms$treatment[ms$treatment == "Fe-with"] <- "4"
+
+
+b <- ggplot(ms, aes(x = treatment, y = mean, fill = treatment)) +
+  geom_bar(stat = "identity", position = position_dodge(), colour = "black") + 
+  geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd), width=.2,
+                position=position_dodge(.9)) +
+  scale_fill_manual(values = c("red4", "steelblue4", "red1", "steelblue1")) +
+  facet_grid(cols = vars(Year)) +
+  scale_x_discrete(breaks = unique(ms$treatment),
+                   labels = addline_format(c("Ch Without", "Fe Without", 
+                                             "Ch With", "Fe With"))) +
+  labs(x = "Treatment", 
+       y = bquote("Mean dry matter [kg*" ~ha^-1 ~"]")) + 
+  theme_bw() +
+  theme(axis.text = element_text(size = 12), 
+        axis.title.y = element_text(size = 14),
+        axis.title.x = element_blank(), 
+        plot.title = element_text(size = 15), 
+        strip.text.y = element_text(size = 13), 
+        strip.text.x = element_text(size = 13), 
+        legend.position = "none")
+b
+#winter barley matches, oats not
+spross <- read_excel("data Trial C_2020_06_10_naemi.xlsx", 
+                     sheet = "PlantNutrients Bearbeitet", 
+                     col_types = c("text", "text", "text", 
+                                   "text", "text", "text", "text", "text", 
+                                   "date", "text", "text", "text", "text", 
+                                   "text", "text", "text", "text", "text", 
+                                   "text", "text", "text", "text", "text", 
+                                   "text", "text", "text", "text", "text", 
+                                   "text", "text", "text", "text", "text", 
+                                   "text", "text", "text", "numeric", 
+                                   "text", "text"))
+
+
+#1. data frame vorbereiten
+spross <- slice(spross, 1:360)
+
+names(spross)[9] <- "date"
+names(spross)[10] <- "spross_dm"
+names(spross)[19] <- "grain_dm"
+
+spross[20:39] <- NULL
+
+spross <- separate(spross, date, sep = "-", into =c("Year", "Month", "Day"))
+
+spross <- make_JDay(spross)
+
+spross <- transform(spross, spross_dm = as.numeric(spross_dm), 
+                    grain_dm = as.numeric(grain_dm))
+
+#spross <- spross %>% mutate_at(vars(spross_dm), funs(round(., 1)))
+
+f <- filter(spross, treatment == "5")
+s <- filter(spross, treatment == "6")
+
+spross <- bind_rows(f, s)
+
+spross$rainout.shelter[is.na(spross$rainout.shelter)] = "without"
+
+spross <- filter(spross, Year == "2017")
+
+spross <- drop_na(spross, grain_dm)
+
+ms <- spross %>% group_by(treatment, rainout.shelter, plot) %>% 
+  summarise(mean1 = mean(grain_dm), sd1 = sd(grain_dm))
+
+ms <- ms %>% group_by(treatment, rainout.shelter) %>% 
+  summarise(mean = mean(mean1), sd = sd(mean1))
+
+ms$treatment[ms$treatment == "5"] <- "Ch"
+ms$treatment[ms$treatment == "6"] <- "Fe"
+
+
+
+
+
+
 
 
 
