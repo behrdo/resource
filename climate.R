@@ -89,6 +89,10 @@ p21 <- p21[!(p21$depth == "195" & p21$rainshelter == "without"),]
 
 wasser <- bind_rows(p7, p8, p16, p17, p19, p21)
 
+#looking for the plot that causes problems in treatment 5 at 75 cm
+wasser <- wasser[!(wasser$depth == "75" & wasser$plot == "7"),]
+#-> it was plot 7
+
 df <- wasser
 
 df <- df %>% group_by(JDay, plot, trtcomp, depth) %>%
@@ -98,7 +102,8 @@ df <- df %>% group_by(JDay, plot, trtcomp, depth) %>%
 df <- df %>% group_by(JDay, trtcomp, depth) %>%
   summarise(Anzahl_Parzellen = length(VWC), 
             mean_VWC= mean(VWC, na.rm=TRUE))
-
+#deleting data before the 1.Mai 2015 (measurement errors)
+df <- filter(df, JDay > 120)
 df <- filter(df, mean_VWC < 100)
 df <- na.omit(df)
 
