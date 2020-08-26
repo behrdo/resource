@@ -90,8 +90,11 @@ p21 <- p21[!(p21$depth == "195" & p21$rainshelter == "without"),]
 wasser <- bind_rows(p7, p8, p16, p17, p19, p21)
 
 #looking for the plot that causes problems in treatment 5 at 75 cm
-wasser <- wasser[!(wasser$depth == "75" & wasser$plot == "7"),]
+wasser <- wasser[!(wasser$depth == "75" & wasser$plot == "7" & wasser$rainshelter == "without"),]
 #-> it was plot 7
+
+#deleting data before the 1.Mai 2015 (measurement errors)
+wasser <- filter(wasser, JDay > 120)
 
 df <- wasser
 
@@ -102,8 +105,7 @@ df <- df %>% group_by(JDay, plot, trtcomp, depth) %>%
 df <- df %>% group_by(JDay, trtcomp, depth) %>%
   summarise(Anzahl_Parzellen = length(VWC), 
             mean_VWC= mean(VWC, na.rm=TRUE))
-#deleting data before the 1.Mai 2015 (measurement errors)
-df <- filter(df, JDay > 120)
+
 df <- filter(df, mean_VWC < 100)
 df <- na.omit(df)
 
@@ -430,6 +432,57 @@ wasser16 <- bind_rows(p7, p8, p16, p17, p19, p21)
 names(wasser16)[1] <- "Dates"
 wasser16$Year <- rep(2016, nrow(wasser16))
 
+#looking for the plot that causes problems in treatment 6 at 165 cm
+wasser16 <- wasser16[!(wasser16$depth == "165" & wasser16$plot == "8" & 
+                         wasser16$rainshelter == "with"),]
+#-> it was plot 8
+
+df <- wasser16
+
+df <- df %>% group_by(JDay, plot, trtcomp, depth) %>%
+  summarise(Anzahl_Parzellen = length(VWC), 
+            VWC= mean(VWC, na.rm=TRUE))
+
+df <- df %>% group_by(JDay, trtcomp, depth) %>%
+  summarise(Anzahl_Parzellen = length(VWC), 
+            mean_VWC= mean(VWC, na.rm=TRUE))
+
+df <- filter(df, mean_VWC < 100)
+df <- na.omit(df)
+
+df$trtcomp[df$trtcomp == "1"] <- "Fe Rainfed" #fe=6
+df$trtcomp[df$trtcomp == "2"] <- "Ch Rainfed" #ch=5
+df$trtcomp[df$trtcomp == "3"] <- "Fe Rainshelter" #fe=6
+df$trtcomp[df$trtcomp == "4"] <- "Ch Rainshelter" #ch=5
+df$depth[df$depth == "15"] <- "1"
+df$depth[df$depth == "45"] <- "2"
+df$depth[df$depth == "75"] <- "3"
+df$depth[df$depth == "105"] <- "4"
+df$depth[df$depth == "135"] <- "5"
+df$depth[df$depth == "165"] <- "6"
+df$depth[df$depth == "195"] <- "7"
+
+df <- transform(df, depth = as.factor(depth))
+
+ggplot(df, aes(x = as.Date(JDay, origin = as.Date("2018-01-01")), y = mean_VWC, color = trtcomp)) + 
+  geom_line() +
+  facet_grid(rows = vars(depth)) +
+  #  scale_linetype_manual(values = c(rep("solid", 2), rep("dashed", 2)), legen) +
+  scale_colour_manual(values = c("red4", "steelblue4", "red1", "steelblue2"), 
+                      name = "Treatment") +
+  scale_x_date(date_labels = "%b", date_breaks = "2 months") +
+  labs(x = "Months", y = "Mean Volumetric Water Content [%]") +
+  theme_bw() +
+  theme(axis.text = element_text(size = 12), 
+        axis.title.y = element_text(size = 14),
+        axis.title.x = element_blank(), 
+        plot.title = element_text(size = 15), 
+        strip.text.y = element_text(size = 13), 
+        strip.text.x = element_text(size = 13),
+        legend.position = "bottom", 
+        legend.text = element_text(size = 13), 
+        legend.title = element_text(size = 13))
+
 #creating a dataframe for 2017 ####
 wa17 <- read_excel("2017_AVR_VWC.xlsx")
 
@@ -694,11 +747,11 @@ p8a$treatment <- rep(6, nrow(p8a))
 p8a$rainshelter <- rep("without", nrow(p8a))
 p8a$trtcomp <- rep(1, nrow(p8a))
 
-names(p8b)[3] <- "45"
-names(p8b)[4] <- "75"
-names(p8b)[5] <- "105"
-names(p8b)[6] <- "165"
-names(p8b)[7] <- "195"
+names(p8b)[2] <- "45"
+names(p8b)[3] <- "75"
+names(p8b)[4] <- "105"
+names(p8b)[5] <- "165"
+names(p8b)[6] <- "195"
 
 p8b <- gather(p8b, "45", "75", "105", "165", "195", key = "depth", value = "VWC")
 p8b$treatment <- rep(6, nrow(p8b))
@@ -718,6 +771,74 @@ p8$plot <- rep(8, nrow(p8))
 wasser17 <- bind_rows(p7, p8, p16, p17, p19, p21)
 wasser17$Year <- rep(2017, nrow(wasser17))
 
+#looking for the plot that causes problems in treatment 5 at 75cm
+wasser17 <- wasser17[!(wasser17$depth == "75" & wasser17$plot == "7" & 
+                         wasser17$rainshelter == "with"),]
+wasser17 <- wasser17[!(wasser17$depth == "75" & wasser17$plot == "19" & 
+                         wasser17$rainshelter == "with"),]
+#-> it was plot 8 and plot 19
+
+#looking for the plot that causes problems in treatment 5 at 105cm
+wasser17 <- wasser17[!(wasser17$depth == "105" & wasser17$plot == "19" & 
+                         wasser17$rainshelter == "with"),]
+#-> it was plot 19
+
+#looking for the plot that causes problems in treatment 5 at 135cm
+wasser17 <- wasser17[!(wasser17$depth == "135" & wasser17$plot == "19" & 
+                         wasser17$rainshelter == "with"),]
+#-> it was plot 19
+
+#looking for the plot that causes problems in treatment 5 at 135cm
+wasser17 <- wasser17[!(wasser17$depth == "165" & wasser17$plot == "8" & 
+                         wasser17$rainshelter == "with"),]
+#-> it was plot 8
+
+df <- wasser17
+
+df <- df %>% group_by(JDay, plot, trtcomp, depth) %>%
+  summarise(Anzahl_Parzellen = length(VWC), 
+            VWC= mean(VWC, na.rm=TRUE))
+
+df <- df %>% group_by(JDay, trtcomp, depth) %>%
+  summarise(Anzahl_Parzellen = length(VWC), 
+            mean_VWC= mean(VWC, na.rm=TRUE))
+
+df <- filter(df, mean_VWC < 100)
+df <- na.omit(df)
+
+df$trtcomp[df$trtcomp == "1"] <- "Fe Rainfed" #fe=6
+df$trtcomp[df$trtcomp == "2"] <- "Ch Rainfed" #ch=5
+df$trtcomp[df$trtcomp == "3"] <- "Fe Rainshelter" #fe=6
+df$trtcomp[df$trtcomp == "4"] <- "Ch Rainshelter" #ch=5
+df$depth[df$depth == "15"] <- "1"
+df$depth[df$depth == "45"] <- "2"
+df$depth[df$depth == "75"] <- "3"
+df$depth[df$depth == "105"] <- "4"
+df$depth[df$depth == "135"] <- "5"
+df$depth[df$depth == "165"] <- "6"
+df$depth[df$depth == "195"] <- "7"
+
+df <- transform(df, depth = as.factor(depth))
+
+ggplot(df, aes(x = as.Date(JDay, origin = as.Date("2018-01-01")), y = mean_VWC, color = trtcomp)) + 
+  geom_line() +
+  facet_grid(rows = vars(depth)) +
+  #  scale_linetype_manual(values = c(rep("solid", 2), rep("dashed", 2)), legen) +
+  scale_colour_manual(values = c("red4", "steelblue4", "red1", "steelblue2"), 
+                      name = "Treatment") +
+  scale_x_date(date_labels = "%b", date_breaks = "2 months") +
+  labs(x = "Months", y = "Mean Volumetric Water Content [%]") +
+  theme_bw() +
+  theme(axis.text = element_text(size = 12), 
+        axis.title.y = element_text(size = 14),
+        axis.title.x = element_blank(), 
+        plot.title = element_text(size = 15), 
+        strip.text.y = element_text(size = 13), 
+        strip.text.x = element_text(size = 13),
+        legend.position = "bottom", 
+        legend.text = element_text(size = 13), 
+        legend.title = element_text(size = 13))
+
 #plotting VWC ####
 df <- bind_rows(wasser, wasser16, wasser17)
 
@@ -729,7 +850,6 @@ df <- df %>% group_by(JDay, Year, trtcomp, depth) %>%
             sd_VWC = sd(VWC, na.rm=TRUE))
 #there are round about 400 values in 2017 that are >100%! <- decided to exclude them for now
 df <- filter(df, mean_VWC < 100)
-df <- na.omit(df)
 
 df$trtcomp[df$trtcomp == "1"] <- "Fe Rainfed" #fe=6
 df$trtcomp[df$trtcomp == "2"] <- "Ch Rainfed" #ch=5
