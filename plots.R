@@ -43,13 +43,13 @@ a <- ggplot(ms, aes(x = reorder(depth, -mean), y = mean, fill = treatment)) +
        y = bquote("Mean Biopores [" ~m^-2 ~ "]"),
        title = "A") + 
   theme_bw() +
-  theme(axis.text = element_text(size = 12), 
-        axis.title = element_text(size = 14), 
-        plot.title = element_text(size = 15, vjust = -10, hjust = 0.03), 
+  theme(axis.text = element_text(size = 12, face = "bold"), 
+        axis.title = element_text(size = 14, face = "bold"), 
+        plot.title = element_text(size = 15, vjust = -10, hjust = 0.03, face = "bold"), 
         strip.text.y = element_text(size = 10), 
         strip.text.x = element_text(size = 10),
         legend.text = element_text(size = 15), 
-        legend.title = element_text(size = 15), 
+        legend.title = element_text(size = 15, face = "bold"), 
         legend.position = c(0.8, 0.80))
 a
 
@@ -77,11 +77,11 @@ b <- ggplot(ms1, aes(x = treatment, y = mean, fill = treatment)) +
        y = bquote("Mean dry matter [kg * " ~ha^-1 ~"]"),
        title = "B") + 
   theme_bw() +
-  theme(axis.text = element_text(size = 12), 
-        axis.title = element_text(size = 14), 
-        plot.title = element_text(size = 15, vjust = -10, hjust = 0.03), 
+  theme(axis.text = element_text(size = 12, face = "bold"), 
+        axis.title = element_text(size = 14, face = "bold"), 
+        plot.title = element_text(size = 15, vjust = -10, hjust = 0.03, face = "bold"), 
         strip.text.y = element_text(size = 10), 
-        strip.text.x = element_text(size = 10), 
+        strip.text.x = element_text(size = 10),
         legend.position = "none")
 b
 
@@ -116,12 +116,12 @@ c <- ggplot(nutr, aes(x = treatm, y = mean_n, fill = treatm)) +
        y = bquote("Mean N accumulation [kg * " ~ha^-1 ~"]"),
        title = "C") + 
   theme_bw() +
-  theme(axis.text = element_text(size = 12), 
-        axis.title = element_text(size = 14), 
+  theme(axis.text = element_text(size = 12, face = "bold"), 
+        axis.title = element_text(size = 14, face = "bold"), 
         axis.title.x = element_blank(),
-        plot.title = element_text(size = 15, vjust = -10, hjust = 0.03), 
-        strip.text.y = element_text(size = 10), 
-        strip.text.x = element_text(size = 10), 
+        plot.title = element_text(size = 15, vjust = -10, hjust = 0.03, face = "bold"), 
+        strip.text.y = element_text(size = 10, face = "bold"), 
+        strip.text.x = element_text(size = 10, face = "bold"), 
         legend.position = "none")
 c
 
@@ -134,12 +134,12 @@ d <- ggplot(nutr, aes(x = treatm, y = mean_p, fill = treatm)) +
        y = bquote("Mean P accumulation [kg * " ~ha^-1 ~"]"),
        title = "D") + 
   theme_bw() +
-  theme(axis.text = element_text(size = 12), 
-        axis.title = element_text(size = 14),
+  theme(axis.text = element_text(size = 12, face = "bold"), 
+        axis.title = element_text(size = 14, face = "bold"),
         axis.title.x = element_blank(),
-        plot.title = element_text(size = 15, vjust = -10, hjust = 0.03), 
-        strip.text.y = element_text(size = 10), 
-        strip.text.x = element_text(size = 10), 
+        plot.title = element_text(size = 15, vjust = -10, hjust = 0.03, face = "bold"), 
+        strip.text.y = element_text(size = 10, face = "bold"), 
+        strip.text.x = element_text(size = 10, face = "bold"), 
         legend.position = "none")
 d
 
@@ -152,12 +152,12 @@ e <- ggplot(nutr, aes(x = treatm, y = mean_k, fill = treatm)) +
        y = bquote("Mean K accumulation [kg * " ~ha^-1 ~"]"),
        title = "E") + 
   theme_bw() +
-  theme(axis.text = element_text(size = 12), 
-        axis.title = element_text(size = 14), 
+  theme(axis.text = element_text(size = 12, face = "bold"), 
+        axis.title = element_text(size = 14, face = "bold"), 
         axis.title.x = element_blank(),
-        plot.title = element_text(size = 15, vjust = -10, hjust = 0.03), 
-        strip.text.y = element_text(size = 10), 
-        strip.text.x = element_text(size = 10), 
+        plot.title = element_text(size = 15, vjust = -10, hjust = 0.03, face = "bold"), 
+        strip.text.y = element_text(size = 10, face = "bold"), 
+        strip.text.x = element_text(size = 10, face = "bold"), 
         legend.position = "none")
 e
 
