@@ -8,7 +8,7 @@ library(chillR)
 Rohdaten_shoot <- read.csv2("precrop data C.csv")
 
 #dry matter ####
-#checking for normality
+#creating df and calculating mean, sd and such
 q <- filter(Rohdaten_shoot, treatment == 5)
 w <- filter(Rohdaten_shoot, treatment == 6)
 
@@ -16,6 +16,12 @@ qw <- bind_rows(q, w)
 
 qw <- transform(qw, treatment = as.factor(treatment))
 
+summary(q$DM_mean) #treatment ch
+summary(w$DM_mean) #treatment fe
+sd(q$DM_mean) #treatment ch
+sd(w$DM_mean) #treatment fe
+
+#checking for normality
 shapiro.test(q$DM_mean)
 shapiro.test(w$DM_mean)
 
@@ -54,6 +60,21 @@ names(biopore)[9] <- "5mm"
 
 f <- filter(biopore, treatment == 5)
 s <- filter(biopore, treatment == 6)
+
+summary(f$gesamt) #treatment ch
+summary(s$gesamt) #treatment fe
+sd(f$gesamt) #treatment ch
+sd(s$gesamt) #treatment fe
+
+summary(f$`2.5mm`) #treatment ch
+summary(s$`2.5mm`) #treatment fe
+sd(f$`2.5mm`) #treatment ch
+sd(s$`2.5mm`) #treatment fe
+
+summary(f$`5mm`) #treatment ch
+summary(s$`5mm`) #treatment fe
+sd(f$`5mm`) #treatment ch
+sd(s$`5mm`) #treatment fe
 
 df <- bind_rows(f, s)
 
@@ -104,6 +125,22 @@ Rohdaten_shoot <- read.csv2("precrop data C.csv")
 
 nutr1 <- filter(Rohdaten_shoot, treatment == 5)
 nutr2 <- filter(Rohdaten_shoot, treatment == 6)
+
+summary(nutr1$N_mean) #treatment ch
+summary(nutr2$N_mean) #treatment fe
+sd(nutr1$N_mean) #treatment ch
+sd(nutr2$N_mean) #treatment fe
+
+summary(nutr1$P_mean) #treatment ch
+summary(nutr2$P_mean) #treatment fe
+sd(nutr1$P_mean) #treatment ch
+sd(nutr2$P_mean) #treatment fe
+
+summary(nutr1$K_mean) #treatment ch
+summary(nutr2$K_mean) #treatment fe
+sd(nutr1$K_mean) #treatment ch
+sd(nutr2$K_mean) #treatment fe
+
 
 nutr <- bind_rows(nutr1, nutr2)
 
@@ -172,7 +209,7 @@ plot(model2)
 par(mfrow = c(1, 1))
 #jup i would say so
 
-#dry matter at last harvest - two way anova ####
+#dry matter  shoot at last harvest - two way anova ####
 #1. preparing data frame
 spross <- read_excel("data Trial C_2020_06_10_naemi.xlsx", 
                      sheet = "PlantNutrients Bearbeitet", 
@@ -230,7 +267,16 @@ oats <- filter(spross, crop == "oats")
 
 s_osr[5] <- NULL
 
-#2014/spring barley ####
+#2014/spring barley - shoot ####
+#mean and stuff
+f <- filter(s_barley, treatment == "5")
+s <- filter(s_barley, treatment == "6")
+
+summary(f$spross_dm) #treatment ch
+summary(s$spross_dm) #treatment fe
+sd(f$spross_dm) #treatment ch
+sd(s$spross_dm) #treatment fe
+
 #one way anova
 model1 <- lm(spross_dm ~ treatment, data = s_barley)
 summary(model1)
@@ -247,7 +293,27 @@ plot(model2)
 par(mfrow = c(1, 1))
 #jup i would say so
 
-#2015/spring oil seed rape ####
+#2015/spring oil seed rape - shoot ####
+#mean and stuff
+f <- filter(s_osr, treatment == "5")
+f_with <- filter(f, rainout.shelter == "with")
+f_without <- filter(f, rainout.shelter == "without")
+s <- filter(s_osr, treatment == "6")
+s_with <- filter(s, rainout.shelter == "with")
+s_without <- filter(s, rainout.shelter == "without")
+
+#with shelter
+summary(f_with$spross_dm) #treatment ch
+summary(s_with$spross_dm) #treatment fe
+sd(f_with$spross_dm) #treatment ch
+sd(s_with$spross_dm) #treatment fe
+
+#without shelter
+summary(f_without$spross_dm) #treatment ch
+summary(s_without$spross_dm) #treatment fe
+sd(f_without$spross_dm) #treatment ch
+sd(s_without$spross_dm) #treatment fe
+
 #two way anova, with treatment and rainout shelter as main effects
 model1 <- lm(spross_dm ~ treatment*rainout.shelter, data = s_osr)
 summary(model1)
@@ -296,7 +362,27 @@ anova(model1, model2)
 #p-value: 0.3963 -> no significant effect
 #conclusions: no significant effect of either the fixed or the random effects on the DM
 
-#2016/winter barley ####
+#2016/winter barley - shoot ####
+#mean and stuff
+f <- filter(w_barley, treatment == "5")
+f_with <- filter(f, rainout.shelter == "with")
+f_without <- filter(f, rainout.shelter == "without")
+s <- filter(w_barley, treatment == "6")
+s_with <- filter(s, rainout.shelter == "with")
+s_without <- filter(s, rainout.shelter == "without")
+
+#with shelter
+summary(f_with$spross_dm) #treatment ch
+summary(s_with$spross_dm) #treatment fe
+sd(f_with$spross_dm) #treatment ch
+sd(s_with$spross_dm) #treatment fe
+
+#without shelter
+summary(f_without$spross_dm) #treatment ch
+summary(s_without$spross_dm) #treatment fe
+sd(f_without$spross_dm) #treatment ch
+sd(s_without$spross_dm) #treatment fe
+
 #two way anova, with treatment and rainout shelter as main effects
 model1 <- lm(spross_dm ~ treatment*rainout.shelter, data = w_barley)
 summary(model1)
@@ -321,7 +407,28 @@ plot(model2)
 par(mfrow = c(1, 1))
 #jup i would say so
 
-#2017/oats ####
+#2017/oats - shoot ####
+#mean and stuff
+f <- filter(oats, treatment == "5")
+f_with <- filter(f, rainout.shelter == "with")
+f_without <- filter(f, rainout.shelter == "without")
+s <- filter(oats, treatment == "6")
+s_with <- filter(s, rainout.shelter == "with")
+s_without <- filter(s, rainout.shelter == "without")
+
+#with shelter
+summary(f_with$spross_dm) #treatment ch
+summary(s_with$spross_dm) #treatment fe
+sd(f_with$spross_dm) #treatment ch
+sd(s_with$spross_dm) #treatment fe
+
+#without shelter
+summary(f_without$spross_dm) #treatment ch
+summary(s_without$spross_dm) #treatment fe
+sd(f_without$spross_dm) #treatment ch
+sd(s_without$spross_dm) #treatment fe
+
+
 #two-way anova with treatment and rainout shelter as fixed effects
 model1 <- lm(spross_dm ~ treatment*rainout.shelter, data = oats)
 summary(model1)
@@ -399,5 +506,230 @@ anova(model1, model2)
 #p-value: 0.4566 -> no significant effect 
 #makes no sence to continue further, effect of Rep is lower than the effect of field.rep
 
+#dry matter at last harvest grain ####
+spross <- read_excel("data Trial C_2020_06_10_naemi.xlsx", 
+                     sheet = "PlantNutrients Bearbeitet", 
+                     col_types = c("text", "text", "text", 
+                                   "text", "text", "text", "text", "text", 
+                                   "date", "text", "text", "text", "text", 
+                                   "text", "text", "text", "text", "text", 
+                                   "text", "text", "text", "text", "text", 
+                                   "text", "text", "text", "text", "text", 
+                                   "text", "text", "text", "text", "text", 
+                                   "text", "text", "text", "numeric", 
+                                   "text", "text"))
+
+spross <- slice(spross, 1:360)
+
+names(spross)[9] <- "date"
+names(spross)[19] <- "grain_dm"
+
+spross[20:27] <- NULL
+spross[21:31] <-NULL
+
+spross <- separate(spross, date, sep = "-", into =c("Year", "Month", "Day"))
+
+spross <- make_JDay(spross)
+
+spross <- transform(spross, grain_dm = as.numeric(grain_dm))
+
+spross <- spross %>% mutate_at(vars(grain_dm), funs(round(., 1)))
+#this error just suggests to use another function then funs, it works for me though
+
+f <- filter(spross, treatment == "5")
+s <- filter(spross, treatment == "6")
+
+spross <- bind_rows(f, s)
+
+spross <- transform(spross, rainout.shelter = as.factor(rainout.shelter), 
+                    field.rep = as.factor(field.rep), 
+                    plot = as.factor(plot), 
+                    Rep = as.factor(Rep))
+
+spross$rainout.shelter[is.na(spross$rainout.shelter)] = "without"
+
+spross <- drop_na(spross, grain_dm)
+
+spross[13:20] <- NULL
+spross[6] <- NULL
+spross[1] <- NULL
+spross[12] <- NULL
+spross[10] <- NULL
+
+spross <- spross %>%  group_by(Year) %>%  filter(JDay == max(JDay))
+
+#creating dataframes for each year/plant-species
+s_barley <- filter(spross, crop == "spring barley")#keine rainout.shelter
+w_barley <- filter(spross, crop == "winter barley")
+oats <- filter(spross, crop == "oats")
+
+#grain yield 2014-sb ####
+#mean and stuff
+f <- filter(s_barley, treatment == "5")
+s <- filter(s_barley, treatment == "6")
+
+summary(f$grain_dm) #treatment ch
+summary(s$grain_dm) #treatment fe
+sd(f$grain_dm) #treatment ch
+sd(s$grain_dm) #treatment fe
+
+#one way anova
+model1 <- lm(grain_dm ~ treatment, data = s_barley)
+summary(model1)
+
+model2 <- lm(grain_dm ~ 1, data = s_barley)
+summary(model2)
+
+anova(model1, model2)
+#p-value: 0.04631 -> the treatment has a significant effect
+#but are they even nd? ->
+par(mfrow = c(2, 2))
+plot(model1)
+plot(model2)
+par(mfrow = c(1, 1))
+#jup i would say so
+
+#2016/winter barley - grain ####
+#mean and stuff
+f <- filter(w_barley, treatment == "5")
+f_with <- filter(f, rainout.shelter == "with")
+f_without <- filter(f, rainout.shelter == "without")
+s <- filter(w_barley, treatment == "6")
+s_with <- filter(s, rainout.shelter == "with")
+s_without <- filter(s, rainout.shelter == "without")
+
+#with shelter
+summary(f_with$grain_dm) #treatment ch
+summary(s_with$grain_dm) #treatment fe
+sd(f_with$grain_dm) #treatment ch
+sd(s_with$grain_dm) #treatment fe
+
+#without shelter
+summary(f_without$grain_dm) #treatment ch
+summary(s_without$grain_dm) #treatment fe
+sd(f_without$grain_dm) #treatment ch
+sd(s_without$grain_dm) #treatment fe
+
+#two way anova, with treatment and rainout shelter as main effects
+model1 <- lm(grain_dm ~ treatment*rainout.shelter, data = w_barley)
+summary(model1)
+
+model2 <- lm(grain_dm ~ treatment, data = w_barley)
+summary(model1)
+
+anova(model1, model2)
+#p-value: 0.2592 -> no significant effect of rainout.shelter
+model1 <- lm(grain_dm ~ treatment*rainout.shelter, data = w_barley)
+summary(model1)
+
+model2 <- lm(grain_dm ~ rainout.shelter, data = w_barley)
+summary(model1)
+
+anova(model1, model2)
+#p-value: 0.6686 -> not significant effect of treatment
+#but are they even nd? ->
+par(mfrow = c(2, 2))
+plot(model1)
+plot(model2)
+par(mfrow = c(1, 1))
+#jup i would say so
+
+#2017/oats - grain ####
+#mean and stuff
+f <- filter(oats, treatment == "5")
+f_with <- filter(f, rainout.shelter == "with")
+f_without <- filter(f, rainout.shelter == "without")
+s <- filter(oats, treatment == "6")
+s_with <- filter(s, rainout.shelter == "with")
+s_without <- filter(s, rainout.shelter == "without")
+
+#with shelter
+summary(f_with$grain_dm) #treatment ch
+summary(s_with$grain_dm) #treatment fe
+sd(f_with$grain_dm) #treatment ch
+sd(s_with$grain_dm) #treatment fe
+
+#without shelter
+summary(f_without$grain_dm) #treatment ch
+summary(s_without$grain_dm) #treatment fe
+sd(f_without$grain_dm) #treatment ch
+sd(s_without$grain_dm) #treatment fe
+
+
+#two-way anova with treatment and rainout shelter as fixed effects
+model1 <- lm(grain_dm ~ treatment*rainout.shelter, data = oats)
+summary(model1)
+
+model2 <- lm(grain_dm ~ treatment, data = oats)
+summary(model1)
+
+anova(model1, model2)
+#p-value: 0.6953 -> no significant effect 
+
+model1 <- lm(grain_dm ~ treatment*rainout.shelter, data = oats)
+summary(model1)
+
+model2 <- lm(grain_dm ~ rainout.shelter, data = oats)
+summary(model1)
+
+anova(model1, model2)
+#p-value: 0.6624 -> no significant effect 
+
+#two-way anova introducing field.rep as random effect
+model1 <- lmer(grain_dm ~ treatment*rainout.shelter + (1|field.rep), data = oats)
+summary(model1)
+
+model2 <- lmer(grain_dm ~ rainout.shelter + (1|field.rep) , data = oats)
+summary(model1)
+
+anova(model1, model2)
+#p-value: 0.5706 -> no significant effect 
+
+model1 <- lmer(grain_dm ~ treatment*rainout.shelter + (1|field.rep), data = oats)
+summary(model1)
+
+model2 <- lmer(grain_dm ~ treatment + (1|field.rep) , data = oats)
+summary(model1)
+
+anova(model1, model2)
+#p-value: 0.6094 -> no significant effect 
+
+model1 <- lmer(grain_dm ~ rainout.shelter + (1|field.rep), data = oats)
+summary(model1)
+
+model2 <- lmer(grain_dm ~ (1|field.rep) , data = oats)
+summary(model1)
+
+anova(model1, model2)
+#p-value: 0.8194 -> no significant effect
+
+model1 <- lmer(grain_dm ~ treatment + (1|field.rep), data = oats)
+summary(model1)
+
+model2 <- lmer(grain_dm ~ (1|field.rep) , data = oats)
+summary(model1)
+
+anova(model1, model2)
+#p-value: 0.6683 -> no significant effect
+
+#two-way anova introducing Rep as random effect
+model1 <- lmer(grain_dm ~ treatment*rainout.shelter + (1|Rep), data = oats)
+summary(model1)
+
+model2 <- lmer(grain_dm ~ rainout.shelter + (1|Rep) , data = oats)
+summary(model1)
+
+anova(model1, model2)
+#p-value: 0.6246 -> no significant effect 
+
+model1 <- lmer(grain_dm ~ treatment*rainout.shelter + (1|Rep), data = oats)
+summary(model1)
+
+model2 <- lmer(grain_dm ~ treatment + (1|Rep) , data = oats)
+summary(model1)
+
+anova(model1, model2)
+#p-value: 0.6602 -> no significant effect 
+#makes no sence to continue further, effect of Rep is lower than the effect of field.rep
 
 
