@@ -69,7 +69,7 @@ ggplot(RL_tot, aes(x = JDay, y = blk_m2, colour = interaction(rainout.shelter, t
   facet_grid(cols = vars(Year)) +
   scale_colour_manual(values = c("brown4", "steelblue4", "brown2", "steelblue2"), name = "Treatment",
                       labels = c("Ch rain shelter", "Ch rainfed", "Fe rain shelter", "Fe rainfed"))+
-  labs(x = "Day Number", y = "Rootlength [m  " ~m^2 ~"]", title = "Total Rootlegth Troughout the Year") +
+  labs(x = "Day Number", y = "Rootlength [m * " ~m^-2 ~"]", title = "Total Rootlegth Troughout the Year") +
   theme_bw() +
   theme(axis.text = element_text(size = 10), 
         axis.title = element_text(size = 11), 
