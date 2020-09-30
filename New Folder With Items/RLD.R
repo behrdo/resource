@@ -6,7 +6,7 @@ library(ggpubr)
 library(lme4)
 library(chillR)
 
-RLD <- read_delim("RLD.csv", ";", escape_double = FALSE, 
+RLD <- read_delim("RLD4.csv", ";", escape_double = FALSE, 
                   col_types = cols(`sampling date` = col_date(format = "%d.%m.%Y"),
                                    `RLD total (cm cm-3)` = col_number(), 
                                    `RLD bulk (cm cm-3)` = col_number(), 

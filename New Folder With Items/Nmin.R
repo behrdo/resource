@@ -62,8 +62,6 @@ ggplot(N_d, aes(x = as.Date(JDay, origin = as.Date("2013-01-01")), y = Nmin,
         axis.title = element_text(size = 11), 
         plot.title = element_text(size = 15), 
         strip.text.y = element_text(size = 10), 
-        strip.text.x = element_text(size = 10),
-        legend.position = "bottom",
-        legend.text = element_text(size = 10),
-        legend.title=element_text(size=11))
+        strip.text.x = element_text(size = 10))+ 
+  theme_bw()
 

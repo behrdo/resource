@@ -6,15 +6,20 @@ library(ggpubr)
 library(lme4)
 library(chillR)
 N <- read_delim("Nmin.csv", ";", escape_double = FALSE, 
+                        col_types = cols(X8 = col_number()), 
                         locale = locale(decimal_mark = ",", grouping_mark = ""), 
                         trim_ws = TRUE)
+N<-N[-c(1:3),]
 N[1] <- NULL
 N[4] <- NULL
-N[6] <- NULL
-N[6] <- NULL
-names(N)[5]  <- "Nmin"
-names(N)[4]  <- "depth"
+N[4] <- NULL
+N[6:7] <- NULL
 names(N)[1] <- "date"
+names(N)[2] <- "treatment"
+names(N)[3] <- "plotID"
+names(N)[4]  <- "depth"
+names(N)[5]  <- "Nmin"
+
 Fe2 <- filter(N, treatment == "6")
 Ch2 <- filter(N, treatment == "5")
 N <- bind_rows(Fe2, Ch2)
@@ -29,11 +34,10 @@ N$Year[N$Year == "2015"]<- "2015 S. Oilseed Rape"
 N$Year[N$Year == "2016"]<- "2016 Winter Barley"
 N$Year[N$Year == "2017"]<- "2017 Oats"
 
-
 #JDay Solution-----------------------
 # make data
 value <- rnorm(365, mean = 0, sd = 5)
-jday <- 1:365 # represents your Julian days 1-365; assumes no leap years
+jday <- 1:365 # represents Julian days 1-365; assumes no leap years
 
 # make data frame and add julian day
 d <- data.frame(jday = jday, value = value, stringsAsFactors = FALSE)
@@ -62,8 +66,6 @@ ggplot(N_d, aes(x = as.Date(JDay, origin = as.Date("2013-01-01")), y = Nmin,
         axis.title = element_text(size = 11), 
         plot.title = element_text(size = 15), 
         strip.text.y = element_text(size = 10), 
-        strip.text.x = element_text(size = 10),
-        legend.position = "bottom",
-        legend.text = element_text(size = 10),
-        legend.title=element_text(size=11))
+        strip.text.x = element_text(size = 10))+ 
+  theme_bw()
 
